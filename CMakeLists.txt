@@ -38,6 +38,10 @@ endif()
 ###set(OPENJPEG_LIBRARY_NAME openjp2)
 set(OPENJPEG_LIBRARY_NAME ${PROJECT_NAME})
 
+### Question: where these variables should be set (there are a lot of ${OPENJPEG_NAMESPACE}... variables in  the code)?
+set(OPENJPEG_SOURCE_DIR ${CMAKE_SOURCE_DIR})
+set(OPENJPEG_BINARY_DIR ${CMAKE_BINARY_DIR})
+
 ### project(${OPENJPEG_NAMESPACE} C)
 
 # Do full dependency headers.
@@ -82,9 +86,9 @@ set(OPENJPEG_LIBRARY_PROPERTIES
 
 # --------------------------------------------------------------------------
 # Path to additional CMake modules
-set(CMAKE_MODULE_PATH
-    ${${OPENJPEG_NAMESPACE}_SOURCE_DIR}/cmake
-    ${CMAKE_MODULE_PATH})
+###set(CMAKE_MODULE_PATH
+###    ${${OPENJPEG_NAMESPACE}_SOURCE_DIR}/cmake
+###    ${CMAKE_MODULE_PATH})
 
 # --------------------------------------------------------------------------
 # On Visual Studio 8 MS deprecated C. This removes all 1.276E1265 security
