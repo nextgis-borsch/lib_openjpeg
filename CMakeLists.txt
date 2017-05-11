@@ -1,13 +1,26 @@
 # Main CMakeLists.txt to build the OpenJPEG project using CMake (www.cmake.org)
 # Written by Mathieu Malaterre
 
+# Modified for NextGIS Borsch project
+
 # This CMake project will by default create a library called openjpeg
 # But if you want to use this project within your own (CMake) project
 # you will eventually like to prefix the library to avoid linking confusion
 # For this purpose you can define a CMake var: OPENJPEG_NAMESPACE to whatever you like
 # e.g.:
 # set(OPENJPEG_NAMESPACE "GDCMOPENJPEG")
-cmake_minimum_required(VERSION 2.8.2)
+
+### cmake_minimum_required(VERSION 2.8.2)
+cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
+
+project(openjpeg)
+
+### for Borsch
+set(CMAKE_COLOR_MAKEFILE ON)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
+
+### for Borsch
+include(FindAnyProject)
 
 if(COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0003 NEW)
@@ -22,9 +35,10 @@ if(NOT OPENJPEG_NAMESPACE)
 endif()
 # In all cases:
 #string(TOLOWER ${OPENJPEG_NAMESPACE} OPENJPEG_LIBRARY_NAME)
-set(OPENJPEG_LIBRARY_NAME openjp2)
+###set(OPENJPEG_LIBRARY_NAME openjp2)
+set(OPENJPEG_LIBRARY_NAME ${PROJECT_NAME})
 
-project(${OPENJPEG_NAMESPACE} C)
+### project(${OPENJPEG_NAMESPACE} C)
 
 # Do full dependency headers.
 include_regular_expression("^.*$")
@@ -102,60 +116,67 @@ endif()
 # --------------------------------------------------------------------------
 # Install directories
 # Build DOCUMENTATION (not in ALL target and only if Doxygen is found)
-option(BUILD_DOC "Build the HTML documentation (with doxygen if available)." OFF)
+###option(BUILD_DOC "Build the HTML documentation (with doxygen if available)." OFF)
 
 string(TOLOWER ${PROJECT_NAME} projectname)
 set(OPENJPEG_INSTALL_SUBDIR "${projectname}-${OPENJPEG_VERSION_MAJOR}.${OPENJPEG_VERSION_MINOR}")
 
-if(NOT OPENJPEG_INSTALL_BIN_DIR)
-  set(OPENJPEG_INSTALL_BIN_DIR "bin")
-endif()
+###if(NOT OPENJPEG_INSTALL_BIN_DIR)
+###  set(OPENJPEG_INSTALL_BIN_DIR "bin")
+###endif()
 
-if(NOT OPENJPEG_INSTALL_LIB_DIR)
-  set(OPENJPEG_INSTALL_LIB_DIR "lib")
-endif()
+###if(NOT OPENJPEG_INSTALL_LIB_DIR)
+###  set(OPENJPEG_INSTALL_LIB_DIR "lib")
+###endif()
 
-if(NOT OPENJPEG_INSTALL_SHARE_DIR)
-  set(OPENJPEG_INSTALL_SHARE_DIR "share")
-endif()
+###if(NOT OPENJPEG_INSTALL_SHARE_DIR)
+###  set(OPENJPEG_INSTALL_SHARE_DIR "share")
+###endif()
 
-if(NOT OPENJPEG_INSTALL_DATA_DIR)
-  set(OPENJPEG_INSTALL_DATA_DIR "${OPENJPEG_INSTALL_SHARE_DIR}/${OPENJPEG_INSTALL_SUBDIR}")
-endif()
+###if(NOT OPENJPEG_INSTALL_DATA_DIR)
+###  set(OPENJPEG_INSTALL_DATA_DIR "${OPENJPEG_INSTALL_SHARE_DIR}/${OPENJPEG_INSTALL_SUBDIR}")
+###endif()
 
-if(NOT OPENJPEG_INSTALL_INCLUDE_DIR)
-  set(OPENJPEG_INSTALL_INCLUDE_DIR "include/${OPENJPEG_INSTALL_SUBDIR}")
-endif()
+###if(NOT OPENJPEG_INSTALL_INCLUDE_DIR)
+###  set(OPENJPEG_INSTALL_INCLUDE_DIR "include/${OPENJPEG_INSTALL_SUBDIR}")
+###endif()
 
-if(BUILD_DOC)
-if(NOT OPENJPEG_INSTALL_MAN_DIR)
-  set(OPENJPEG_INSTALL_MAN_DIR "share/man/")
-endif()
+###if(BUILD_DOC)
+###if(NOT OPENJPEG_INSTALL_MAN_DIR)
+###  set(OPENJPEG_INSTALL_MAN_DIR "share/man/")
+###endif()
 
-if(NOT OPENJPEG_INSTALL_DOC_DIR)
-  set(OPENJPEG_INSTALL_DOC_DIR "share/doc/${OPENJPEG_INSTALL_SUBDIR}")
-endif()
-endif()
+###if(NOT OPENJPEG_INSTALL_DOC_DIR)
+###  set(OPENJPEG_INSTALL_DOC_DIR "share/doc/${OPENJPEG_INSTALL_SUBDIR}")
+###endif()
+###endif()
 
-if(NOT OPENJPEG_INSTALL_JNI_DIR)
-  if(WIN32)
-    set(OPENJPEG_INSTALL_JNI_DIR ${OPENJPEG_INSTALL_BIN_DIR})
-  else()
-    set(OPENJPEG_INSTALL_JNI_DIR ${OPENJPEG_INSTALL_LIB_DIR})
-  endif()
-endif()
+###if(NOT OPENJPEG_INSTALL_JNI_DIR)
+###  if(WIN32)
+###    set(OPENJPEG_INSTALL_JNI_DIR ${OPENJPEG_INSTALL_BIN_DIR})
+###  else()
+###    set(OPENJPEG_INSTALL_JNI_DIR ${OPENJPEG_INSTALL_LIB_DIR})
+###  endif()
+###endif()
 
-if(NOT OPENJPEG_INSTALL_PACKAGE_DIR)
+###if(NOT OPENJPEG_INSTALL_PACKAGE_DIR)
   # We could install *.cmake files in share/ however those files contains
   # hardcoded path to libraries on a multi-arch system (fedora/debian) those
   # path will be different (lib/i386-linux-gnu vs lib/x86_64-linux-gnu)
-  set(OPENJPEG_INSTALL_PACKAGE_DIR "${OPENJPEG_INSTALL_LIB_DIR}/${OPENJPEG_INSTALL_SUBDIR}")
-endif()
+###  set(OPENJPEG_INSTALL_PACKAGE_DIR "${OPENJPEG_INSTALL_LIB_DIR}/${OPENJPEG_INSTALL_SUBDIR}")
+###endif()
 
-if (APPLE)
-	list(APPEND OPENJPEG_LIBRARY_PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${OPENJPEG_INSTALL_LIB_DIR}")
-	option(OPJ_USE_DSYMUTIL "Call dsymutil on binaries after build." OFF)
-endif()
+###if (APPLE)
+###	list(APPEND OPENJPEG_LIBRARY_PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${OPENJPEG_INSTALL_LIB_DIR}")
+###	option(OPJ_USE_DSYMUTIL "Call dsymutil on binaries after build." OFF)
+###endif()
+
+### for Borsch
+include(GNUInstallDirs)
+set(INSTALL_BIN_DIR ${CMAKE_INSTALL_BINDIR} CACHE INTERNAL "Installation directory for executables" FORCE)
+set(INSTALL_LIB_DIR ${CMAKE_INSTALL_LIBDIR} CACHE INTERNAL "Installation directory for libraries" FORCE)
+set(INSTALL_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR}/${OPENJPEG_INSTALL_SUBDIR} CACHE INTERNAL "Installation directory for headers" FORCE)
+set(INSTALL_SHARE_DIR ${CMAKE_INSTALL_DATADIR}/${OPENJPEG_INSTALL_SUBDIR} CACHE INTERNAL "Installation directory for share data" FORCE)
 
 #-----------------------------------------------------------------------------
 # Big endian test:
@@ -172,10 +193,10 @@ configure_file(
 
 #-----------------------------------------------------------------------------
 # OpenJPEG build configuration options.
-option(BUILD_SHARED_LIBS "Build OpenJPEG shared library and link executables against it." ON)
-set (EXECUTABLE_OUTPUT_PATH ${OPENJPEG_BINARY_DIR}/bin CACHE PATH "Single output directory for building all executables.")
-set (LIBRARY_OUTPUT_PATH ${OPENJPEG_BINARY_DIR}/bin CACHE PATH "Single output directory for building all libraries.")
-mark_as_advanced(LIBRARY_OUTPUT_PATH EXECUTABLE_OUTPUT_PATH)
+###option(BUILD_SHARED_LIBS "Build OpenJPEG shared library and link executables against it." ON)
+###set (EXECUTABLE_OUTPUT_PATH ${OPENJPEG_BINARY_DIR}/bin CACHE PATH "Single output directory for building all executables.")
+###set (LIBRARY_OUTPUT_PATH ${OPENJPEG_BINARY_DIR}/bin CACHE PATH "Single output directory for building all libraries.")
+###mark_as_advanced(LIBRARY_OUTPUT_PATH EXECUTABLE_OUTPUT_PATH)
 
 #-----------------------------------------------------------------------------
 # configure name mangling to allow multiple libraries to coexist
@@ -242,41 +263,41 @@ unset(CMAKE_REQUIRED_DEFINITIONS)
 check_symbol_exists(memalign malloc.h OPJ_HAVE_MEMALIGN)
 #-----------------------------------------------------------------------------
 # Build Library
-if(BUILD_JPIP_SERVER)
-  find_package(CURL REQUIRED)
-  find_package(FCGI REQUIRED)
-  find_package(Threads REQUIRED)
-  if(NOT CMAKE_USE_PTHREADS_INIT)
-    message(FATAL_ERROR "Only pthread are supported")
-  endif()
-endif()
+###if(BUILD_JPIP_SERVER)
+###  find_package(CURL REQUIRED)
+###  find_package(FCGI REQUIRED)
+###  find_package(Threads REQUIRED)
+###  if(NOT CMAKE_USE_PTHREADS_INIT)
+###    message(FATAL_ERROR "Only pthread are supported")
+###  endif()
+###endif()
 add_subdirectory(src/lib)
-option(BUILD_LUTS_GENERATOR "Build utility to generate t1_luts.h" OFF)
+###option(BUILD_LUTS_GENERATOR "Build utility to generate t1_luts.h" OFF)
 
 #-----------------------------------------------------------------------------
 # Build Applications
-option(BUILD_CODEC "Build the CODEC executables" ON)
-option(BUILD_MJ2 "Build the MJ2 executables." OFF)
-option(BUILD_JPWL "Build the JPWL library and executables" OFF)
-option(BUILD_JPIP "Build the JPIP library and executables." OFF)
-if(BUILD_JPIP)
-  option(BUILD_JPIP_SERVER "Build the JPIP server." OFF)
-endif()
-option(BUILD_VIEWER "Build the OPJViewer executable (C++)" OFF)
-option(BUILD_JAVA "Build the openjpeg jar (Java)" OFF)
-option(BUILD_JP3D "Build the JP3D comp" OFF)
-mark_as_advanced(BUILD_VIEWER)
-mark_as_advanced(BUILD_JAVA)
-mark_as_advanced(BUILD_JP3D)
+###option(BUILD_CODEC "Build the CODEC executables" OFF)
+###option(BUILD_MJ2 "Build the MJ2 executables." OFF)
+###option(BUILD_JPWL "Build the JPWL library and executables" OFF)
+###option(BUILD_JPIP "Build the JPIP library and executables." OFF)
+###if(BUILD_JPIP)
+###  option(BUILD_JPIP_SERVER "Build the JPIP server." OFF)
+###endif()
+###option(BUILD_VIEWER "Build the OPJViewer executable (C++)" OFF)
+###option(BUILD_JAVA "Build the openjpeg jar (Java)" OFF)
+###option(BUILD_JP3D "Build the JP3D comp" OFF)
+###mark_as_advanced(BUILD_VIEWER)
+###mark_as_advanced(BUILD_JAVA)
+###mark_as_advanced(BUILD_JP3D)
 
-if(BUILD_CODEC OR BUILD_MJ2)
+###if(BUILD_CODEC OR BUILD_MJ2)
   # OFF: It will only build 3rd party libs if they are not found on the system
   # ON: 3rd party libs will ALWAYS be build, and used
-  option(BUILD_THIRDPARTY "Build the thirdparty executables if it is needed" OFF)
-  add_subdirectory(thirdparty)
-  add_subdirectory(src/bin)
-endif ()
-add_subdirectory(wrapping)
+  ###option(BUILD_THIRDPARTY "Build the thirdparty executables if it is needed" OFF)
+  ###add_subdirectory(thirdparty)
+  ###add_subdirectory(src/bin)
+###endif ()
+###add_subdirectory(wrapping)
 
 #-----------------------------------------------------------------------------
 # opj_config.h generation (2/2)
@@ -294,95 +315,69 @@ configure_file(
 
 #-----------------------------------------------------------------------------
 # build documentation in doc subdir:
-if(BUILD_DOC)
-  add_subdirectory(doc)
-endif()
+
+### Removed for Borsch
 
 #-----------------------------------------------------------------------------
 # Buld Testing
-option(BUILD_TESTING "Build the tests." OFF)
-if(BUILD_TESTING)
-  if(BUILD_CODEC)
-    enable_testing()
-    include(CTest)
 
-    # Search openjpeg data needed for the tests
-    # They could be found via git on the OpenJPEG GitHub code project
-    # git clone https://github.com/uclouvain/openjpeg-data.git
-    find_path(OPJ_DATA_ROOT README-OPJ-Data
-      PATHS $ENV{OPJ_DATA_ROOT} ${CMAKE_SOURCE_DIR}/../data
-      NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH
-      )
-
-    # Add repository where to find tests
-    add_subdirectory(tests)
-
-  else()
-    message(FATAL_ERROR "You need build codec to run the tests")
-  endif()
-endif()
+### Removed for Borsch
 
 #-----------------------------------------------------------------------------
 # install all targets referenced as OPENJPEGTargets
-install(EXPORT OpenJPEGTargets DESTINATION ${OPENJPEG_INSTALL_PACKAGE_DIR})
-configure_file( ${${OPENJPEG_NAMESPACE}_SOURCE_DIR}/cmake/OpenJPEGConfig.cmake.in
-  ${${OPENJPEG_NAMESPACE}_BINARY_DIR}/OpenJPEGConfig.cmake
-  @ONLY
-)
-install( FILES ${OPENJPEG_BINARY_DIR}/OpenJPEGConfig.cmake
-  DESTINATION ${OPENJPEG_INSTALL_PACKAGE_DIR}
-)
+###install(EXPORT OpenJPEGTargets DESTINATION ${OPENJPEG_INSTALL_PACKAGE_DIR})
+###configure_file( ${${OPENJPEG_NAMESPACE}_SOURCE_DIR}/cmake/OpenJPEGConfig.cmake.in
+###  ${${OPENJPEG_NAMESPACE}_BINARY_DIR}/OpenJPEGConfig.cmake
+###  @ONLY
+###)
+###install( FILES ${OPENJPEG_BINARY_DIR}/OpenJPEGConfig.cmake
+###  DESTINATION ${OPENJPEG_INSTALL_PACKAGE_DIR}
+###)
 
 #-----------------------------------------------------------------------------
 # install CHANGES and LICENSE
-if(BUILD_DOC)
-if(EXISTS ${OPENJPEG_SOURCE_DIR}/CHANGES)
-  install(FILES CHANGES DESTINATION ${OPENJPEG_INSTALL_DOC_DIR})
-endif()
+###if(BUILD_DOC)
+###if(EXISTS ${OPENJPEG_SOURCE_DIR}/CHANGES)
+###  install(FILES CHANGES DESTINATION ${OPENJPEG_INSTALL_DOC_DIR})
+###endif()
 
-install(FILES LICENSE DESTINATION ${OPENJPEG_INSTALL_DOC_DIR})
-endif()
+###install(FILES LICENSE DESTINATION ${OPENJPEG_INSTALL_DOC_DIR})
+###endif()
 
 include (cmake/OpenJPEGCPack.cmake)
 
 #-----------------------------------------------------------------------------
 # pkgconfig support
 # enabled by default on Unix, disabled by default on other platforms
-if(UNIX)
-  option(BUILD_PKGCONFIG_FILES "Build and install pkg-config files" ON)
-else()
-  option(BUILD_PKGCONFIG_FILES "Build and install pkg-config files" OFF)
-endif()
-if(BUILD_PKGCONFIG_FILES)
-  # install in lib and not share (see multi-arch note above)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/lib/openjp2/libopenjp2.pc.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/libopenjp2.pc @ONLY)
-  install( FILES  ${CMAKE_CURRENT_BINARY_DIR}/libopenjp2.pc DESTINATION
-    ${OPENJPEG_INSTALL_LIB_DIR}/pkgconfig )
-#
-  if(BUILD_JPWL)
-  # install in lib and not share (see multi-arch note above)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/lib/openjpwl/libopenjpwl.pc.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/libopenjpwl.pc @ONLY)
-  install( FILES  ${CMAKE_CURRENT_BINARY_DIR}/libopenjpwl.pc DESTINATION
-    ${OPENJPEG_INSTALL_LIB_DIR}/pkgconfig )
-  endif()
-#
-  if(BUILD_JPIP)
-  # install in lib and not share (see multi-arch note above)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/lib/openjpip/libopenjpip.pc.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/libopenjpip.pc @ONLY)
-  install( FILES  ${CMAKE_CURRENT_BINARY_DIR}/libopenjpip.pc DESTINATION
-    ${OPENJPEG_INSTALL_LIB_DIR}/pkgconfig )
-  endif()
-#
-  if(BUILD_JP3D)
-  # install in lib and not share (see multi-arch note above)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/lib/openjp3d/libopenjp3d.pc.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/libopenjp3d.pc @ONLY)
-  install( FILES  ${CMAKE_CURRENT_BINARY_DIR}/libopenjp3d.pc DESTINATION
-    ${OPENJPEG_INSTALL_LIB_DIR}/pkgconfig )
-  endif()
-endif()
+
+### Removed for Borsch
 
 #-----------------------------------------------------------------------------
+
+
+### Borsch export
+if (REGISTER_PACKAGE)
+    export(TARGETS ${PROJECT_NAME} FILE ${PROJECT_NAME}-exports.cmake)
+
+    set(EXPORT_PACKAGE_NAME OpenJPEG)
+    string(TOUPPER ${EXPORT_PACKAGE_NAME} EXPORT_PACKAGE_NAME_UPPER)
+    set(EXPORT_PACKAGE_LIB_NAME ${PROJECT_NAME})
+
+    export(PACKAGE ${EXPORT_PACKAGE_NAME})
+
+    include(CMakePackageConfigHelpers)
+    configure_package_config_file(
+        ${CMAKE_SOURCE_DIR}/cmake/PackageConfig.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_PACKAGE_NAME}Config.cmake
+        INSTALL_DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )
+    write_basic_package_version_file(
+        ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_PACKAGE_NAME}ConfigVersion.cmake
+        VERSION ${VERSION}
+        COMPATIBILITY AnyNewerVersion )
+else()
+    export(TARGETS ${PROJECT_NAME} FILE ${PROJECT_NAME}-exports.cmake EXPORT_LINK_INTERFACE_LIBRARIES)
+endif()
+
+
+
+

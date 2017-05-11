@@ -1,8 +1,9 @@
 include_regular_expression("^.*$")
 
 #
-install( FILES  ${CMAKE_CURRENT_BINARY_DIR}/opj_config.h
- DESTINATION ${OPENJPEG_INSTALL_INCLUDE_DIR} COMPONENT Headers)
+###install( FILES  ${CMAKE_CURRENT_BINARY_DIR}/opj_config.h
+### DESTINATION ${OPENJPEG_INSTALL_INCLUDE_DIR} COMPONENT Headers)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/opj_config.h DESTINATION ${INSTALL_INC_DIR} COMPONENT headers)
 
 include_directories(
   ${${OPENJPEG_NAMESPACE}_BINARY_DIR}/src/lib/openjp2 # opj_config.h and opj_config_private.h
@@ -57,19 +58,19 @@ set(OPENJPEG_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/opj_malloc.h
   ${CMAKE_CURRENT_SOURCE_DIR}/opj_stdint.h
 )
-if(BUILD_JPIP)
-  add_definitions(-DUSE_JPIP)
-  set(OPENJPEG_SRCS
-    ${OPENJPEG_SRCS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/cidx_manager.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/cidx_manager.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/phix_manager.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/ppix_manager.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/thix_manager.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/tpix_manager.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/indexbox_manager.h
-  )
-endif()
+###if(BUILD_JPIP)
+###  add_definitions(-DUSE_JPIP)
+###  set(OPENJPEG_SRCS
+###    ${OPENJPEG_SRCS}
+###    ${CMAKE_CURRENT_SOURCE_DIR}/cidx_manager.c
+###    ${CMAKE_CURRENT_SOURCE_DIR}/cidx_manager.h
+###    ${CMAKE_CURRENT_SOURCE_DIR}/phix_manager.c
+###    ${CMAKE_CURRENT_SOURCE_DIR}/ppix_manager.c
+###    ${CMAKE_CURRENT_SOURCE_DIR}/thix_manager.c
+###    ${CMAKE_CURRENT_SOURCE_DIR}/tpix_manager.c
+###    ${CMAKE_CURRENT_SOURCE_DIR}/indexbox_manager.h
+###  )
+###endif()
 
 option(OPJ_DISABLE_TPSOT_FIX "Disable TPsot==TNsot fix. See https://github.com/uclouvain/openjpeg/issues/254." OFF)
 if(OPJ_DISABLE_TPSOT_FIX)
@@ -99,33 +100,40 @@ if(${CMAKE_VERSION} VERSION_GREATER "2.8.11")
 endif()
 
 # Install library
+###install(TARGETS ${OPENJPEG_LIBRARY_NAME}
+###  EXPORT OpenJPEGTargets
+###  RUNTIME DESTINATION ${OPENJPEG_INSTALL_BIN_DIR} COMPONENT Applications
+###  LIBRARY DESTINATION ${OPENJPEG_INSTALL_LIB_DIR} COMPONENT Libraries
+###  ARCHIVE DESTINATION ${OPENJPEG_INSTALL_LIB_DIR} COMPONENT Libraries
+###)
 install(TARGETS ${OPENJPEG_LIBRARY_NAME}
-  EXPORT OpenJPEGTargets
-  RUNTIME DESTINATION ${OPENJPEG_INSTALL_BIN_DIR} COMPONENT Applications
-  LIBRARY DESTINATION ${OPENJPEG_INSTALL_LIB_DIR} COMPONENT Libraries
-  ARCHIVE DESTINATION ${OPENJPEG_INSTALL_LIB_DIR} COMPONENT Libraries
+    RUNTIME DESTINATION ${INSTALL_BIN_DIR} COMPONENT libraries
+    ARCHIVE DESTINATION ${INSTALL_LIB_DIR} COMPONENT libraries
+    LIBRARY DESTINATION ${INSTALL_LIB_DIR} COMPONENT libraries
+    FRAMEWORK DESTINATION ${INSTALL_LIB_DIR}
 )
 
 # Install includes files
-install(FILES openjpeg.h opj_stdint.h
-  DESTINATION ${OPENJPEG_INSTALL_INCLUDE_DIR} COMPONENT Headers
-)
+###install(FILES openjpeg.h opj_stdint.h
+###  DESTINATION ${OPENJPEG_INSTALL_INCLUDE_DIR} COMPONENT Headers
+###)
+install(FILES openjpeg.h opj_stdint.h DESTINATION ${INSTALL_INC_DIR} COMPONENT headers)
 
-if(BUILD_DOC)
+###if(BUILD_DOC)
 # install man page of the library
-install(
-  FILES       ${OPENJPEG_SOURCE_DIR}/doc/man/man3/libopenjp2.3
-  DESTINATION ${OPENJPEG_INSTALL_MAN_DIR}/man3)
-endif()
+###install(
+###  FILES       ${OPENJPEG_SOURCE_DIR}/doc/man/man3/libopenjp2.3
+###  DESTINATION ${OPENJPEG_INSTALL_MAN_DIR}/man3)
+###endif()
 
-if(BUILD_LUTS_GENERATOR)
+###if(BUILD_LUTS_GENERATOR)
 # internal utility to generate t1_luts.h (part of the jp2 lib)
 # no need to install:
-  add_executable(t1_generate_luts t1_generate_luts.c)
-  if(UNIX)
-    target_link_libraries(t1_generate_luts m)
-  endif()
-endif()
+###  add_executable(t1_generate_luts t1_generate_luts.c)
+###  if(UNIX)
+###    target_link_libraries(t1_generate_luts m)
+###  endif()
+###endif()
 
 # Experimental option; let's how cppcheck performs
 # Implementation details:
