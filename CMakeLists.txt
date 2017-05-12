@@ -73,6 +73,13 @@ set(OPENJPEG_LIBRARY_PROPERTIES
   SOVERSION "${OPENJPEG_SOVERSION}"
 )
 
+### Write versions for Borsch/Installer
+include(util)
+write_version(OPENJPEG_VERSION_MAJOR OPENJPEG_VERSION_MINOR OPENJPEG_VERSION_BUILD)
+set(VERSION ${OPENJPEG_VERSION_MAJOR}.${OPENJPEG_VERSION_MINOR}.${OPENJPEG_VERSION_BUILD})
+set(SOVERSION 1)
+report_version(${PROJECT_NAME} ${VERSION})
+
 # --------------------------------------------------------------------------
 # Path to additional CMake modules
 ###set(CMAKE_MODULE_PATH
