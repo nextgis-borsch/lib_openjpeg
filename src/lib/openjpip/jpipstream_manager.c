@@ -1,8 +1,8 @@
 /*
  * $Id$
  *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
+ * Copyright (c) 2002-2011, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2011, Professor Benoit Macq
  * Copyright (c) 2010-2011, Kaori Hagihara
  * All rights reserved.
  *
@@ -76,34 +76,19 @@ Byte_t * jpipstream_to_pnm( Byte_t *jpipstream, msgqueue_param_t *msgqueue, Byte
   Byte_t *pnmstream;
   Byte_t *j2kstream; /* j2k or jp2 codestream */
   Byte8_t j2klen;
-  size_t retlen;
   FILE *fp;
   const char j2kfname[] = "tmp.j2k";
 
-  fp = fopen( j2kfname, "w+b");
-  if( !fp )
-    {
-    return NULL;
-    }
   j2kstream = recons_j2k( msgqueue, jpipstream, csn, fw, fh, &j2klen); 
-  if( !j2kstream )
-    {
-    fclose(fp);
-    remove( j2kfname);
-    return NULL;
-    }
 
-  retlen = fwrite( j2kstream, 1, j2klen, fp);
+  fp = fopen( j2kfname, "w+b");
+  fwrite( j2kstream, j2klen, 1, fp);
   opj_free( j2kstream);
-  fclose(fp);
-  if( retlen != j2klen )
-    {
-    remove( j2kfname);
-    return NULL;
-    }
+  fseek( fp, 0, SEEK_SET);
 
-  pnmstream = j2k_to_pnm( j2kfname, ihdrbox);
+  pnmstream = j2k_to_pnm( fp, ihdrbox);
 
+  fclose( fp);
   remove( j2kfname);
 
   return pnmstream;

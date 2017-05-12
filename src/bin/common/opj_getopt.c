@@ -1,9 +1,4 @@
 /*
- * The copyright in this software is being made available under the 3-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
  * Copyright (c) 1987, 1993, 1994
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -15,7 +10,11 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -54,7 +53,7 @@ int opj_opterr = 1,			/* if error message should be printed */
 static char EMSG[]={""};
 
 /* As this class remembers its values from one Java call to the other, reset the values before each use */
-void opj_reset_options_reading(void) {
+void reset_options_reading(void) {
 	opj_opterr = 1;
 	opj_optind = 1;
 }
@@ -66,7 +65,7 @@ void opj_reset_options_reading(void) {
 int opj_getopt(int nargc, char *const *nargv, const char *ostr) {
 #  define __progname nargv[0]
   static char *place = EMSG;	/* option letter processing */
-  const char *oli = NULL;	/* option letter list index */
+  char *oli = NULL;			/* option letter list index */
 
   if (opj_optreset || !*place) {	/* update scanning pointer */
     opj_optreset = 0;
@@ -125,7 +124,7 @@ int opj_getopt(int nargc, char *const *nargv, const char *ostr) {
 int opj_getopt_long(int argc, char * const argv[], const char *optstring,
 const opj_option_t *longopts, int totlen) {
 	static int lastidx,lastofs;
-	const char *tmp;
+	char *tmp;
 	int i,len;
 	char param = 1;
 

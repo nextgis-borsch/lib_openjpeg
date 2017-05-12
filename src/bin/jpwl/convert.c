@@ -1,15 +1,9 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
+ * Copyright (c) 2002-2007, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2007, Professor Benoit Macq
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2003-2007, Francois-Olivier Devaux 
- * Copyright (c) 2003-2014, Antonin Descampe
+ * Copyright (c) 2003-2007, Francois-Olivier Devaux and Antonin Descampe
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
  * Copyright (c) 2006-2007, Parvatha Elangovan
  * All rights reserved.
@@ -35,21 +29,21 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#include "opj_apps_config.h"
+#include "opj_config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
-#ifdef OPJ_HAVE_LIBTIFF
+#ifdef HAVE_LIBTIFF
 #include <tiffio.h>
-#endif /* OPJ_HAVE_LIBTIFF */
+#endif /* HAVE_LIBTIFF */
 
-#ifdef OPJ_HAVE_LIBPNG
+#ifdef HAVE_LIBPNG
 #include <zlib.h>
 #include <png.h>
-#endif /* OPJ_HAVE_LIBPNG */
+#endif /* HAVE_LIBPNG */
 
 #include "openjpeg.h"
 #include "convert.h"
@@ -100,7 +94,7 @@ struct tga_header
 
 static unsigned short get_ushort(unsigned short val) {
 
-#ifdef OPJ_BIG_ENDIAN
+#ifdef WORDS_BIGENDIAN
 	return( ((val & 0xff) << 8) + (val >> 8) );
 #else
     return( val );
@@ -185,11 +179,12 @@ static int tga_readheader(FILE *fp, unsigned int *bits_per_pixel,
 	return 1;
 }
 
-#ifdef OPJ_BIG_ENDIAN
+#if WORDS_BIGENDIAN == 1
 
-static inline uint16_t swap16(uint16_t x)
+static inline int16_t swap16(int16_t x)
 {
-    return(((x & 0x00ffU) << 8) | ((x & 0xff00U) >> 8));
+  return((((u_int16_t)x & 0x00ffU) <<  8) |
+     (((u_int16_t)x & 0xff00U) >>  8));
 }
 
 #endif
@@ -231,7 +226,7 @@ static int tga_writeheader(FILE *fp, int bits_per_pixel, int width, int height,
 	image_w = (unsigned short)width;
 	image_h = (unsigned short) height;
 
-#ifndef OPJ_BIG_ENDIAN
+#if WORDS_BIGENDIAN == 0
 	if(fwrite(&image_w, 2, 1, fp) != 1) goto fails;
 	if(fwrite(&image_h, 2, 1, fp) != 1) goto fails;
 #else
@@ -1435,7 +1430,7 @@ int imagetopgx(opj_image_t * image, const char *outfile) {
 			fprintf(stderr, "ERROR -> failed to open %s for writing\n", name);
 			return 1;
 		}
-    /* don't need name anymore */
+    /* dont need name anymore */
     if( total > 256 ) {
       free(name);
       }
@@ -2079,7 +2074,7 @@ int imagetopnm(opj_image_t * image, const char *outfile)
 	return 0;
 }/* imagetopnm() */
 
-#ifdef OPJ_HAVE_LIBTIFF
+#ifdef HAVE_LIBTIFF
 /* -->> -->> -->> -->>
 
 	TIFF IMAGE FORMAT
@@ -2786,7 +2781,7 @@ opj_image_t* tiftoimage(const char *filename, opj_cparameters_t *parameters)
 
 }/* tiftoimage() */
 
-#endif /* OPJ_HAVE_LIBTIFF */
+#endif /* HAVE_LIBTIFF */
 
 /* -->> -->> -->> -->>
 
@@ -2857,7 +2852,6 @@ opj_image_t* rawtoimage(const char *filename, opj_cparameters_t *parameters, raw
 			for (i = 0; i < w * h; i++) {
 				if (!fread(&value, 1, 1, f)) {
 					fprintf(stderr,"Error reading raw file. End of file probably reached.\n");
-					fclose(f);
 					return NULL;
 				}
 				image->comps[compno].data[i] = raw_cp->rawSigned?(char)value:value;
@@ -2872,13 +2866,11 @@ opj_image_t* rawtoimage(const char *filename, opj_cparameters_t *parameters, raw
 				unsigned char temp;
 				if (!fread(&temp, 1, 1, f)) {
 					fprintf(stderr,"Error reading raw file. End of file probably reached.\n");
-					fclose(f);
 					return NULL;
 				}
 				value = temp << 8;
 				if (!fread(&temp, 1, 1, f)) {
 					fprintf(stderr,"Error reading raw file. End of file probably reached.\n");
-					fclose(f);
 					return NULL;
 				}
 				value += temp;
@@ -2888,7 +2880,6 @@ opj_image_t* rawtoimage(const char *filename, opj_cparameters_t *parameters, raw
 	}
 	else {
 		fprintf(stderr,"OpenJPEG cannot encode raw components with bit depth higher than 16 bits.\n");
-		fclose(f);
 		return NULL;
 	}
 
@@ -3036,7 +3027,7 @@ int imagetoraw(opj_image_t * image, const char *outfile)
 	return 0;
 }
 
-#ifdef OPJ_HAVE_LIBPNG
+#ifdef HAVE_LIBPNG
 
 #define PNG_MAGIC "\x89PNG\x0d\x0a\x1a\x0a"
 #define MAGIC_SIZE 8
@@ -3569,4 +3560,4 @@ fin:
 
 	return fails;
 }/* imagetopng() */
-#endif /* OPJ_HAVE_LIBPNG */
+#endif /* HAVE_LIBPNG */

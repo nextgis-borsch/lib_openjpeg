@@ -1,9 +1,4 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
  * Copyright (c) 2012, Mathieu Malaterre <mathieu.malaterre@gmail.com>
  * All rights reserved.
  *
@@ -32,7 +27,7 @@
 #define OPJ_STDINT_H
 
 #include "opj_config.h"
-#ifdef OPJ_HAVE_STDINT_H
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
 #else
 #if defined(_WIN32)
@@ -47,6 +42,19 @@ typedef unsigned __int64  uint64_t;
 #else
 #error unsupported platform
 #endif
+#endif
+typedef size_t        OPJ_SIZE_T;
+
+/* 64-bit file offset type */
+typedef int64_t OPJ_OFF_T;
+
+#ifndef HAVE_SSIZE_T
+#if defined(_WIN32)
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
+#else
+#error SSIZE_T is undefined
+#endif /* _WIN32 */
 #endif
 
 #endif /* OPJ_STDINT_H */

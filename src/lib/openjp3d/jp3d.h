@@ -1,9 +1,4 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
  * Copyright (c) 2003-2005, Francois Devaux and Antonin Descampe
@@ -70,7 +65,7 @@ The functions in J3D.C have for goal to read/write the several parts of the code
 #define J3D_MS_EOC 0xffd9	/**< EOC marker value */
 #define J3D_MS_CAP 0xff50	/**< CAP marker value */
 #define J3D_MS_SIZ 0xff51	/**< SIZ marker value */
-#define J3D_MS_NSI 0xff54	/**< NSI marker value */
+#define J3D_MS_ZSI 0xff54	/**< ZSI marker value */
 #define J3D_MS_COD 0xff52	/**< COD marker value */
 #define J3D_MS_COC 0xff53	/**< COC marker value */
 #define J3D_MS_RGN 0xff5e	/**< RGN marker value */

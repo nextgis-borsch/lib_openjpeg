@@ -1,15 +1,9 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
+ * Copyright (c) 2002-2007, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2007, Professor Benoit Macq
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2003-2007, Francois-Olivier Devaux 
- * Copyright (c) 2003-2014, Antonin Descampe
+ * Copyright (c) 2003-2007, Francois-Olivier Devaux and Antonin Descampe
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
  * Copyright (c) 2008, Jerome Fimes, Communications & Systemes <jerome.fimes@c-s.fr>
  * All rights reserved.
@@ -77,13 +71,10 @@ typedef struct opj_mqc {
 	OPJ_BYTE *end;
 	opj_mqc_state_t *ctxs[MQC_NUMCTXS];
 	opj_mqc_state_t **curctx;
-	const OPJ_BYTE *lut_ctxno_zc_orient; /* lut_ctxno_zc shifted by 256 * bandno */
 #ifdef MQC_PERF_OPT
 	unsigned char *buffer;
 #endif
 } opj_mqc_t;
-
-#include "mqc_inl.h"
 
 /** @name Exported functions */
 /*@{*/
@@ -201,7 +192,7 @@ Decode a symbol
 @param mqc MQC handle
 @return Returns the decoded symbol (0 or 1)
 */
-static INLINE OPJ_INT32 opj_mqc_decode(opj_mqc_t * const mqc);
+OPJ_INT32 opj_mqc_decode(opj_mqc_t * const mqc);
 /* ----------------------------------------------------------------------- */
 /*@}*/
 

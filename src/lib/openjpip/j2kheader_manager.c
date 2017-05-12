@@ -1,8 +1,8 @@
 /*
  * $Id$
  *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
+ * Copyright (c) 2002-2011, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2011, Professor Benoit Macq
  * Copyright (c) 2010-2011, Kaori Hagihara 
  * Copyright (c) 2011,      Lucian Corlaciu, GSoC
  * All rights reserved.
@@ -117,7 +117,6 @@ CODmarker_param_t get_CODmkrdata_from_j2kstream( Byte_t *CODstream)
 
   if( *CODstream++ != 0xff || *CODstream++ != 0x52){
     fprintf( FCGI_stderr, "Error, COD marker not found in the reconstructed j2kstream\n");
-    memset(&COD, 0, sizeof(COD));
     return COD;
   }
   
@@ -140,7 +139,7 @@ CODmarker_param_t get_CODmkrdata_from_j2kstream( Byte_t *CODstream)
   else{
     COD.XPsiz = (Byte4_t *)opj_malloc( sizeof(Byte4_t));
     COD.YPsiz = (Byte4_t *)opj_malloc( sizeof(Byte4_t));
-    COD.XPsiz[0] = COD.YPsiz[0] = 1<<15; /*pow(2,15)*/
+    COD.XPsiz[0] = COD.YPsiz[0] = pow(2,15);
   }
   return COD;
 }

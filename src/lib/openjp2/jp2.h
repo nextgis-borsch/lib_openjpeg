@@ -1,14 +1,9 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
+ * Copyright (c) 2002-2007, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2007, Professor Benoit Macq
  * Copyright (c) 2002-2003, Yannick Verschueren
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
- * Copyright (c) 2008, 2011-2012, Centre National d'Etudes Spatiales (CNES), FR 
+ * Copyright (c) 2008;2011-2012, Centre National d'Etudes Spatiales (CNES), France 
  * Copyright (c) 2012, CS Systemes d'Information, France
  * All rights reserved.
  *
@@ -90,7 +85,7 @@ typedef enum
 JP2_IMG_STATE;
 
 /** 
-Channel description: channel index, type, association
+Channel description: channel index, type, assocation
 */
 typedef struct opj_jp2_cdef_info
 {
@@ -236,14 +231,25 @@ opj_jp2_img_header_writer_handler_t;
 /* ----------------------------------------------------------------------- */
 
 /**
+ * Writes the Jpeg2000 file Header box - JP2 Header box (warning, this is a super box).
+ *
+ * @param  jp2      the jpeg2000 file codec.
+ * @param  stream      the stream to write data to.
+ * @param  p_manager  user event manager.
+ *
+ * @return true if writing was successful.
+*/
+OPJ_BOOL opj_jp2_write_jp2h(opj_jp2_t *jp2,
+                            opj_stream_private_t *stream,
+                            opj_event_mgr_t * p_manager );
+
+/**
 Setup the decoder decoding parameters using user parameters.
 Decoding parameters are returned in jp2->j2k->cp.
 @param jp2 JP2 decompressor handle
 @param parameters decompression parameters
 */
 void opj_jp2_setup_decoder(opj_jp2_t *jp2, opj_dparameters_t *parameters);
-
-OPJ_BOOL opj_jp2_set_threads(opj_jp2_t *jp2, OPJ_UINT32 num_threads);
 
 /**
  * Decode an image from a JPEG-2000 file stream
@@ -267,9 +273,8 @@ OPJ_BOOL opj_jp2_decode(opj_jp2_t *jp2,
  * @param parameters compression parameters
  * @param image input filled image
  * @param p_manager  FIXME DOC
- * @return OPJ_TRUE if successful, OPJ_FALSE otherwise
 */
-OPJ_BOOL opj_jp2_setup_encoder(  opj_jp2_t *jp2, 
+void opj_jp2_setup_encoder(  opj_jp2_t *jp2, 
                             opj_cparameters_t *parameters, 
                             opj_image_t *image, 
                             opj_event_mgr_t * p_manager);

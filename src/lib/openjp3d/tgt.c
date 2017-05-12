@@ -1,9 +1,4 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
  * Copyright (c) 2003-2005, Francois Devaux and Antonin Descampe
@@ -73,7 +68,6 @@ opj_tgt_tree_t *tgt_create(int numleafsh, int numleafsv, int numleafsz) {
 	opj_tgt_node_t *node = NULL;
 	opj_tgt_node_t *parentnode = NULL;
 	opj_tgt_node_t *parentnode0 = NULL;
-	opj_tgt_node_t *parentnode1 = NULL;
 	opj_tgt_tree_t *tree = NULL;
 	int i, j, k, p, p0;
 	int numlvls;
@@ -114,32 +108,38 @@ opj_tgt_tree_t *tgt_create(int numleafsh, int numleafsv, int numleafsz) {
 	node = tree->nodes;
 	parentnode = &tree->nodes[tree->numleafsh * tree->numleafsv * tree->numleafsz];
 	parentnode0 = parentnode;
-	parentnode1 = parentnode;
+		
+	p = tree->numleafsh * tree->numleafsv * tree->numleafsz;
+	p0 = p;
+	n = 0;
 	/*fprintf(stdout,"\nH %d V %d Z %d numlvls %d nodes %d\n",tree->numleafsh,tree->numleafsv,tree->numleafsz,numlvls,tree->numnodes);*/
 	for (i = 0; i < numlvls - 1; ++i) {
-		for (z = 0; z < nplz[i]; ++z) {
-			for (j = 0; j < nplv[i]; ++j) {
-				k = nplh[i];
-				while(--k >= 0) {
-					node->parent = parentnode;		/*fprintf(stdout,"node[%d].parent = node[%d]\n",n,p);*/
-					++node;
-					if(--k >= 0) {
+		for (j = 0; j < nplv[i]; ++j) {
+			k = nplh[i]*nplz[i];
+			while (--k >= 0) {
+				node->parent = parentnode;		/*fprintf(stdout,"node[%d].parent = node[%d]\n",n,p);*/
+				++node;	++n;		
+				if (--k >= 0 && n < p) {
+					node->parent = parentnode;	/*fprintf(stdout,"node[%d].parent = node[%d]\n",n,p);*/
+					++node;	++n;	
+				}
+				if (nplz[i] != 1){ /*2D operation vs 3D operation*/
+					if (--k >= 0 && n < p) {
 						node->parent = parentnode;	/*fprintf(stdout,"node[%d].parent = node[%d]\n",n,p);*/
-						++node;
+						++node;	++n;
 					}
-					++parentnode;
+					if (--k >= 0 && n < p) {
+						node->parent = parentnode;	/*fprintf(stdout,"node[%d].parent = node[%d]\n",n,p);*/
+						++node;	++n;
+					}
 				}
-				if((j & 1) || j == nplv[i] - 1) {
-					parentnode0 = parentnode;
-				} else {
-					parentnode = parentnode0;
-				}
+				++parentnode; ++p;
 			}
-			if ((z & 1) || z == nplz[i] - 1) {
-				parentnode1 = parentnode;
+			if ((j & 1) || j == nplv[i] - 1) {
+				parentnode0 = parentnode;			p0 = p;		/*fprintf(stdout,"parent = node[%d] \n",p);*/
 			} else {
-				parentnode0 = parentnode1;
-				parentnode = parentnode1;
+				parentnode = parentnode0;			p = p0;		/*fprintf(stdout,"parent = node[%d] \n",p);*/
+				parentnode0 += nplh[i]*nplz[i];		p0 += nplh[i]*nplz[i];
 			}
 		}
 	}

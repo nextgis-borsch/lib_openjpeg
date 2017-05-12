@@ -1,17 +1,11 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
+ * Copyright (c) 2002-2007, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2007, Professor Benoit Macq
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2003-2007, Francois-Olivier Devaux 
- * Copyright (c) 2003-2014, Antonin Descampe
+ * Copyright (c) 2003-2007, Francois-Olivier Devaux and Antonin Descampe
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
- * Copyright (c) 2008, 2011-2012, Centre National d'Etudes Spatiales (CNES), FR 
+ * Copyright (c) 2008;2011-2012, Centre National d'Etudes Spatiales (CNES), France 
  * Copyright (c) 2012, CS Systemes d'Information, France
  * All rights reserved.
  *
@@ -70,7 +64,7 @@ typedef struct opj_tcd_pass {
 	OPJ_UINT32 rate;
 	OPJ_FLOAT64 distortiondec;
 	OPJ_UINT32 len;
-	OPJ_BITFIELD term : 1;
+	OPJ_UINT32 term : 1;
 } opj_tcd_pass_t;
 
 /**
@@ -87,27 +81,25 @@ typedef struct opj_tcd_layer {
 FIXME DOC
 */
 typedef struct opj_tcd_cblk_enc {
-	OPJ_BYTE* data;               /* Data */
-	opj_tcd_layer_t* layers;      /* layer information */
-	opj_tcd_pass_t* passes;       /* information about the passes */
-	OPJ_INT32 x0, y0, x1, y1;     /* dimension of the code-blocks : left upper corner (x0, y0) right low corner (x1,y1) */
+	OPJ_BYTE* data;					/* Data */
+	opj_tcd_layer_t* layers;		/* layer information */
+	opj_tcd_pass_t* passes;		/* information about the passes */
+	OPJ_INT32 x0, y0, x1, y1;		/* dimension of the code-blocks : left upper corner (x0, y0) right low corner (x1,y1) */
 	OPJ_UINT32 numbps;
 	OPJ_UINT32 numlenbits;
-	OPJ_UINT32 data_size;         /* Size of allocated data buffer */
-	OPJ_UINT32 numpasses;         /* number of pass already done for the code-blocks */
-	OPJ_UINT32 numpassesinlayers; /* number of passes in the layer */
-	OPJ_UINT32 totalpasses;	      /* total number of passes */
+	OPJ_UINT32 numpasses;			/* number of pass already done for the code-blocks */
+	OPJ_UINT32 numpassesinlayers;	/* number of passes in the layer */
+	OPJ_UINT32 totalpasses;			/* total number of passes */
 } opj_tcd_cblk_enc_t;
 
 
 typedef struct opj_tcd_cblk_dec {
 	OPJ_BYTE * data;				/* Data */
 	opj_tcd_seg_t* segs;			/* segments information */
-	OPJ_INT32 x0, y0, x1, y1;		/* position of the code-blocks : left upper corner (x0, y0) right low corner (x1,y1) */
+	OPJ_INT32 x0, y0, x1, y1;		/* dimension of the code-blocks : left upper corner (x0, y0) right low corner (x1,y1) */
 	OPJ_UINT32 numbps;
 	OPJ_UINT32 numlenbits;
-	OPJ_UINT32 data_max_size;		/* Size of allocated data buffer */
-	OPJ_UINT32 data_current_size;	/* Size of used data buffer */
+	OPJ_UINT32 len;					/* length */
 	OPJ_UINT32 numnewpasses;		/* number of pass added to the code-blocks */
 	OPJ_UINT32 numsegs;				/* number of segments */
 	OPJ_UINT32 real_num_segs;
@@ -123,7 +115,6 @@ typedef struct opj_tcd_precinct {
 	union{							/* code-blocks information */
 		opj_tcd_cblk_enc_t* enc;
 		opj_tcd_cblk_dec_t* dec;
-		void*               blocks;
 	} cblks;
 	OPJ_UINT32 block_size;			/* size taken by cblks (in bytes) */
 	opj_tgt_tree_t *incltree;	    /* inclusion tree */
@@ -157,16 +148,14 @@ FIXME DOC
 */
 typedef struct opj_tcd_tilecomp
 {
-	OPJ_INT32 x0, y0, x1, y1;           /* dimension of component : left upper corner (x0, y0) right low corner (x1,y1) */
-	OPJ_UINT32 numresolutions;          /* number of resolutions level */
-	OPJ_UINT32 minimum_num_resolutions; /* number of resolutions level to decode (at max)*/
-	opj_tcd_resolution_t *resolutions;  /* resolutions information */
-	OPJ_UINT32 resolutions_size;        /* size of data for resolutions (in bytes) */
-	OPJ_INT32 *data;                    /* data of the component */
-	OPJ_BOOL  ownsData;                 /* if true, then need to free after usage, otherwise do not free */
-	OPJ_UINT32 data_size_needed;        /* we may either need to allocate this amount of data, or re-use image data and ignore this value */
-	OPJ_UINT32 data_size;               /* size of the data of the component */
-	OPJ_INT32 numpix;                   /* add fixed_quality */
+	OPJ_INT32 x0, y0, x1, y1;				/* dimension of component : left upper corner (x0, y0) right low corner (x1,y1) */
+	OPJ_UINT32 numresolutions;				/* number of resolutions level */
+	OPJ_UINT32 minimum_num_resolutions;		/* number of resolutions level to decode (at max)*/
+	opj_tcd_resolution_t *resolutions;	/* resolutions information */
+	OPJ_UINT32 resolutions_size;			/* size of data for resolutions (in bytes) */
+	OPJ_INT32 *data;						/* data of the component */
+	OPJ_UINT32 data_size;					/* size of the data of the component */
+	OPJ_INT32 numpix;						/* add fixed_quality */
 } opj_tcd_tilecomp_t;
 
 
@@ -219,9 +208,7 @@ typedef struct opj_tcd
 	/** current encoded/decoded tile */
 	OPJ_UINT32 tcd_tileno;
 	/** tell if the tcd is a decoder. */
-    OPJ_BITFIELD m_is_decoder : 1;
-    /** Thread pool */
-    opj_thread_pool_t* thread_pool;
+	OPJ_UINT32 m_is_decoder : 1;
 } opj_tcd_t;
 
 /** @name Exported functions */
@@ -251,14 +238,12 @@ void opj_tcd_destroy(opj_tcd_t *tcd);
  * @param	p_tcd		TCD handle.
  * @param	p_image		raw image.
  * @param	p_cp		coding parameters.
- * @param   p_tp        thread pool
  *
  * @return true if the encoding values could be set (false otherwise).
 */
 OPJ_BOOL opj_tcd_init(	opj_tcd_t *p_tcd,
 						opj_image_t * p_image,
-						opj_cp_t * p_cp,
-                        opj_thread_pool_t* p_tp);
+						opj_cp_t * p_cp );
 
 /**
  * Allocates memory for decoding a specific tile.
@@ -266,11 +251,10 @@ OPJ_BOOL opj_tcd_init(	opj_tcd_t *p_tcd,
  * @param	p_tcd		the tile decoder.
  * @param	p_tile_no	the index of the tile received in sequence. This not necessarily lead to the
  * tile at index p_tile_no.
- * @param p_manager the event manager.
  *
  * @return	true if the remaining data is sufficient.
  */
-OPJ_BOOL opj_tcd_init_decode_tile(opj_tcd_t *p_tcd, OPJ_UINT32 p_tile_no, opj_event_mgr_t* p_manager);
+OPJ_BOOL opj_tcd_init_decode_tile(opj_tcd_t *p_tcd, OPJ_UINT32 p_tile_no);
 
 void opj_tcd_makelayer_fixed(opj_tcd_t *tcd, OPJ_UINT32 layno, OPJ_UINT32 final);
 
@@ -300,7 +284,7 @@ OPJ_UINT32 opj_tcd_get_decoded_tile_size (opj_tcd_t *p_tcd );
  * @param	p_data_written	pointer to an int that is incremented by the number of bytes really written on p_dest
  * @param	p_len			Maximum length of the destination buffer
  * @param	p_cstr_info		Codestream information structure
- * @return  true if the coding is successful.
+ * @return  true if the coding is successfull.
 */
 OPJ_BOOL opj_tcd_encode_tile(   opj_tcd_t *p_tcd,
 							    OPJ_UINT32 p_tile_no,
@@ -317,14 +301,12 @@ Decode a tile from a buffer into a raw image
 @param len Length of source buffer
 @param tileno Number that identifies one of the tiles to be decoded
 @param cstr_info  FIXME DOC
-@param manager the event manager.
 */
 OPJ_BOOL opj_tcd_decode_tile(   opj_tcd_t *tcd,
 							    OPJ_BYTE *src,
 							    OPJ_UINT32 len,
 							    OPJ_UINT32 tileno,
-							    opj_codestream_index_t *cstr_info,
-							    opj_event_mgr_t *manager);
+							    opj_codestream_index_t *cstr_info);
 
 
 /**
@@ -344,12 +326,11 @@ OPJ_UINT32 opj_tcd_get_encoded_tile_size ( opj_tcd_t *p_tcd );
  *
  * @param	p_tcd		TCD handle.
  * @param	p_tile_no	current tile index to encode.
- * @param p_manager the event manager.
  *
  * @return true if the encoding values could be set (false otherwise).
 */
 OPJ_BOOL opj_tcd_init_encode_tile (	opj_tcd_t *p_tcd,
-								    OPJ_UINT32 p_tile_no, opj_event_mgr_t* p_manager );
+								    OPJ_UINT32 p_tile_no );
 
 /**
  * Copies tile data from the given memory block onto the system.
@@ -357,13 +338,6 @@ OPJ_BOOL opj_tcd_init_encode_tile (	opj_tcd_t *p_tcd,
 OPJ_BOOL opj_tcd_copy_tile_data (opj_tcd_t *p_tcd,
                                  OPJ_BYTE * p_src,
                                  OPJ_UINT32 p_src_length );
-
-/**
- * Allocates tile component data
- *
- *
- */
-OPJ_BOOL opj_alloc_tile_component_data(opj_tcd_tilecomp_t *l_tilec);
 
 /* ----------------------------------------------------------------------- */
 /*@}*/

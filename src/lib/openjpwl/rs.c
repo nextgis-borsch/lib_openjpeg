@@ -1,9 +1,4 @@
  /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
  * Copyright (c) 2003-2005, Francois Devaux and Antonin Descampe
@@ -225,7 +220,7 @@ void init_rs(int k)
    of the integer "alpha_to[i]" with a(0) being the LSB and a(m-1) the MSB. Thus for
    example the polynomial representation of @^5 would be given by the binary
    representation of the integer "alpha_to[5]".
-                   Similarly, index_of[] can be used as follows:
+                   Similarily, index_of[] can be used as follows:
         As above, let @ represent the primitive element of GF(2^m) that is
    the root of the primitive polynomial p(x). In order to find the power
    of @ (alpha) that has the polynomial representation
@@ -237,7 +232,7 @@ void init_rs(int k)
    NOTE:
         The element alpha_to[2^m-1] = 0 always signifying that the
    representation of "@^infinity" = 0 is (0,0,0,...,0).
-        Similarly, the element index_of[0] = A0 always signifying
+        Similarily, the element index_of[0] = A0 always signifying
    that the power of alpha which has the polynomial representation
    (0,0,...,0) is "infinity".
  

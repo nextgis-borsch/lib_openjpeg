@@ -1,15 +1,9 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
+ * Copyright (c) 2002-2007, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2007, Professor Benoit Macq
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2003-2007, Francois-Olivier Devaux 
- * Copyright (c) 2003-2014, Antonin Descampe
+ * Copyright (c) 2003-2007, Francois-Olivier Devaux and Antonin Descampe
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
  * Copyright (c) 2008, Jerome Fimes, Communications & Systemes <jerome.fimes@c-s.fr>
  * Copyright (c) 2011-2012, Centre National d'Etudes Spatiales (CNES), France 
@@ -83,7 +77,7 @@ Create a tag-tree
 @param numleafsv Height of the array of leafs of the tree
 @return Returns a new tag-tree if successful, returns NULL otherwise
 */
-opj_tgt_tree_t *opj_tgt_create(OPJ_UINT32 numleafsh, OPJ_UINT32 numleafsv, opj_event_mgr_t *manager);
+opj_tgt_tree_t *opj_tgt_create(OPJ_UINT32 numleafsh, OPJ_UINT32 numleafsv);
 
 /**
  * Reinitialises a tag-tree from an exixting one.
@@ -91,12 +85,11 @@ opj_tgt_tree_t *opj_tgt_create(OPJ_UINT32 numleafsh, OPJ_UINT32 numleafsv, opj_e
  * @param	p_tree				the tree to reinitialize.
  * @param	p_num_leafs_h		the width of the array of leafs of the tree
  * @param	p_num_leafs_v		the height of the array of leafs of the tree
- * @param p_manager       the event manager
  * @return	a new tag-tree if successful, NULL otherwise
 */
 opj_tgt_tree_t *opj_tgt_init(opj_tgt_tree_t * p_tree, 
                              OPJ_UINT32  p_num_leafs_h, 
-                             OPJ_UINT32  p_num_leafs_v, opj_event_mgr_t *p_manager);
+                             OPJ_UINT32  p_num_leafs_v);
 /**
 Destroy a tag-tree, liberating memory
 @param tree Tag-tree to destroy

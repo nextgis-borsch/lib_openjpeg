@@ -1,9 +1,4 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
  * Copyright (c) 2003-2005, Francois Devaux and Antonin Descampe
@@ -1296,7 +1291,7 @@ opj_bool jpwl_check_tile(opj_j2k_t *j2k, opj_tcd_t *tcd, int tileno) {
                                                         opj_event_msg(j2k->cinfo, JPWL_ASSUME ? EVT_WARNING : EVT_ERROR,
                                                                 "JPWL: wrong x-cord of block origin %d => x-prec is (%d, %d)\n",
                                                                 block->x0, prec->x0, prec->x1);
-                                                        if (!JPWL_ASSUME)
+                                                        if (!JPWL_ASSUME || JPWL_ASSUME)
                                                                 return OPJ_FALSE;
                                                 };
                                         }

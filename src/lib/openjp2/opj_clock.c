@@ -1,9 +1,4 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
  * All rights reserved.
  *
@@ -29,8 +24,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "opj_includes.h"
-
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -38,6 +31,7 @@
 #include <sys/resource.h>
 #include <sys/times.h>
 #endif /* _WIN32 */
+#include "opj_includes.h"
 
 OPJ_FLOAT64 opj_clock(void) {
 #ifdef _WIN32
@@ -57,9 +51,9 @@ OPJ_FLOAT64 opj_clock(void) {
     getrusage(0,&t);
     /* (2) What is the elapsed time ? - CPU time = User time + System time */
 	/* (2a) Get the seconds */
-    procTime = (OPJ_FLOAT64)(t.ru_utime.tv_sec + t.ru_stime.tv_sec);
+    procTime = t.ru_utime.tv_sec + t.ru_stime.tv_sec;
     /* (2b) More precisely! Get the microseconds part ! */
-    return ( procTime + (OPJ_FLOAT64)(t.ru_utime.tv_usec + t.ru_stime.tv_usec) * 1e-6 ) ;
+    return ( procTime + (t.ru_utime.tv_usec + t.ru_stime.tv_usec) * 1e-6 ) ;
 #endif
 }
 

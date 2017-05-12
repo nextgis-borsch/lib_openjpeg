@@ -1,9 +1,4 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
  * All rights reserved.
  *
@@ -33,7 +28,7 @@
 #include <windows.h>
 #endif /* _WIN32 */
 
-#include "opj_config_private.h"
+#include "opj_config.h"
 #include "opj_includes.h"
 
 /* ---------------------------------------------------------------------- */

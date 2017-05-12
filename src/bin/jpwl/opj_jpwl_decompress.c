@@ -1,15 +1,9 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
+ * Copyright (c) 2002-2007, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2007, Professor Benoit Macq
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2003-2007, Francois-Olivier Devaux 
- * Copyright (c) 2003-2014, Antonin Descampe
+ * Copyright (c) 2003-2007, Francois-Olivier Devaux and Antonin Descampe
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
  * Copyright (c) 2006-2007, Parvatha Elangovan
  * All rights reserved.
@@ -55,16 +49,16 @@
 #define _strnicmp strncasecmp
 #endif /* _WIN32 */
 
-#include "opj_apps_config.h"
+#include "opj_config.h"
 #include "openjpeg.h"
 #include "opj_getopt.h"
 #include "convert.h"
 #include "index.h"
 
-#ifdef OPJ_HAVE_LIBLCMS2
+#ifdef HAVE_LIBLCMS2
 #include <lcms2.h>
 #endif
-#ifdef OPJ_HAVE_LIBLCMS1
+#ifdef HAVE_LIBLCMS1
 #include <lcms.h>
 #endif
 #include "color.h"
@@ -759,7 +753,7 @@ int main(int argc, char **argv) {
 
 	if(image->icc_profile_buf)
    {
-#if defined(OPJ_HAVE_LIBLCMS1) || defined(OPJ_HAVE_LIBLCMS2)
+#if defined(HAVE_LIBLCMS1) || defined(HAVE_LIBLCMS2)
 	color_apply_icc_profile(image);
 #endif
 
@@ -796,7 +790,7 @@ int main(int argc, char **argv) {
 				fprintf(stdout,"Generated Outfile %s\n",parameters.outfile);
 			}
 			break;
-#ifdef OPJ_HAVE_LIBTIFF
+#ifdef HAVE_LIBTIFF
 		case TIF_DFMT:			/* TIFF */
 			if(imagetotif(image, parameters.outfile)){
 				fprintf(stdout,"Outfile %s not generated\n",parameters.outfile);
@@ -805,7 +799,7 @@ int main(int argc, char **argv) {
 				fprintf(stdout,"Generated Outfile %s\n",parameters.outfile);
 			}
 			break;
-#endif /* OPJ_HAVE_LIBTIFF */
+#endif /* HAVE_LIBTIFF */
 		case RAW_DFMT:			/* RAW */
 			if(imagetoraw(image, parameters.outfile)){
 				fprintf(stdout,"Error generating raw file. Outfile %s not generated\n",parameters.outfile);
@@ -823,7 +817,7 @@ int main(int argc, char **argv) {
 				fprintf(stdout,"Successfully generated Outfile %s\n",parameters.outfile);
 			}
 			break;
-#ifdef OPJ_HAVE_LIBPNG
+#ifdef HAVE_LIBPNG
 		case PNG_DFMT:			/* PNG */
 			if(imagetopng(image, parameters.outfile)){
 				fprintf(stdout,"Error generating png file. Outfile %s not generated\n",parameters.outfile);
@@ -832,9 +826,9 @@ int main(int argc, char **argv) {
 				fprintf(stdout,"Successfully generated Outfile %s\n",parameters.outfile);
 			}
 			break;
-#endif /* OPJ_HAVE_LIBPNG */
+#endif /* HAVE_LIBPNG */
 /* Can happen if output file is TIFF or PNG
- * and OPJ_HAVE_LIBTIF or OPJ_HAVE_LIBPNG is undefined
+ * and HAVE_LIBTIF or HAVE_LIBPNG is undefined
 */
 			default:
 				fprintf(stderr,"Outfile %s not generated\n",parameters.outfile);

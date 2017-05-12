@@ -1,7 +1,7 @@
 # Build the demo app, small examples
 
 # First thing define the common source:
-set(common_SRCS
+SET(common_SRCS
   convert.c
   ${OPENJPEG_SOURCE_DIR}/src/bin/common/opj_getopt.c
   )
@@ -26,15 +26,15 @@ if(WIN32)
 endif()
 
 # Loop over all executables:
-foreach(exe opj_jp3d_compress opj_jp3d_decompress)
-  add_executable(${exe} ${exe}.c ${common_SRCS})
-  target_link_libraries(${exe} openjp3d)
+FOREACH(exe opj_jp3d_compress opj_jp3d_decompress)
+  ADD_EXECUTABLE(${exe} ${exe}.c ${common_SRCS})
+  TARGET_LINK_LIBRARIES(${exe} openjp3d)
   # On unix you need to link to the math library:
-  if(UNIX)
-    target_link_libraries(${exe} m)
-  endif(UNIX)
+  IF(UNIX)
+    TARGET_LINK_LIBRARIES(${exe} m)
+  ENDIF(UNIX)
   # Install exe
-  install(TARGETS ${exe}
+  INSTALL(TARGETS ${exe}
     EXPORT OpenJP3DTargets
     DESTINATION ${OPENJPEG_INSTALL_BIN_DIR} COMPONENT Applications
   )

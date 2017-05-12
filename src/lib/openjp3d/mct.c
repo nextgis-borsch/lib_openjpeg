@@ -1,9 +1,4 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
  * Copyright (c) 2003-2005, Francois Devaux and Antonin Descampe
@@ -46,7 +41,7 @@ static const double mct_norms[3] = { 1.732, .8292, .8292 };
 static const double mct_norms_real[3] = { 1.732, 1.805, 1.573 };
 
 /* <summary> */
-/* Forward reversible MCT. */
+/* Foward reversible MCT. */
 /* </summary> */
 void mct_encode(int *c0, int *c1, int *c2, int n) {
 	int i;
@@ -91,7 +86,7 @@ double mct_getnorm(int compno) {
 }
 
 /* <summary> */
-/* Forward irreversible MCT. */
+/* Foward irreversible MCT. */
 /* </summary> */
 void mct_encode_real(int *c0, int *c1, int *c2, int n) {
 	int i;

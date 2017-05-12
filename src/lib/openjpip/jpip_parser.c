@@ -1,8 +1,8 @@
 /*
  * $Id$
  *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
+ * Copyright (c) 2002-2011, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2011, Professor Benoit Macq
  * Copyright (c) 2010-2011, Kaori Hagihara 
  * Copyright (c) 2011,      Lucian Corlaciu, GSoC
  * All rights reserved.
@@ -357,7 +357,7 @@ void enqueue_precincts( int xmin, int xmax, int ymin, int ymax, int tile_id, int
   Byte4_t xminP, xmaxP, yminP, ymaxP;
 
   codeidx  = msgqueue->cachemodel->target->codeidx;
-  /* MM: shouldn't xmin/xmax be Byte4_t instead ? */
+  /* MM: shouldnt xmin/xmax be Byte4_t instead ? */
   if( xmin < 0 || xmax < 0 || ymin < 0 || ymax < 0)
     return;
   /* MM: I think the API should not really be int should it ? */
@@ -438,7 +438,7 @@ void enqueue_allprecincts( int tile_id, int level, int lastcomp, OPJ_BOOL *comps
 OPJ_BOOL enqueue_metabins( query_param_t query_param, metadatalist_param_t *metadatalist, msgqueue_param_t *msgqueue)
 {
   int i;
-  for( i=0; i<MAX_NUMOFBOX && query_param.box_type[i][0]!=0; i++){
+  for( i=0; query_param.box_type[i][0]!=0 && i<MAX_NUMOFBOX; i++){
     if( query_param.box_type[i][0] == '*'){
       fprintf( FCGI_stdout, "Status: 501\r\n");
       fprintf( FCGI_stdout, "Reason: metareq with all box-property * not implemented\r\n");

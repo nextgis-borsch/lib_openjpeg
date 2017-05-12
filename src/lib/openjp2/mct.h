@@ -1,17 +1,11 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
+ * Copyright (c) 2002-2007, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2007, Professor Benoit Macq
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2003-2007, Francois-Olivier Devaux 
- * Copyright (c) 2003-2014, Antonin Descampe
+ * Copyright (c) 2003-2007, Francois-Olivier Devaux and Antonin Descampe
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
- * Copyright (c) 2008, 2011-2012, Centre National d'Etudes Spatiales (CNES), FR 
+ * Copyright (c) 2008;2011-2012, Centre National d'Etudes Spatiales (CNES), France 
  * Copyright (c) 2012, CS Systemes d'Information, France
  * All rights reserved.
  *
@@ -60,7 +54,7 @@ Apply a reversible multi-component transform to an image
 @param c2 Samples blue component
 @param n Number of samples for each component
 */
-void opj_mct_encode(OPJ_INT32* OPJ_RESTRICT c0, OPJ_INT32* OPJ_RESTRICT c1, OPJ_INT32* OPJ_RESTRICT c2, OPJ_UINT32 n);
+void opj_mct_encode(OPJ_INT32 *c0, OPJ_INT32 *c1, OPJ_INT32 *c2, OPJ_UINT32 n);
 /**
 Apply a reversible multi-component inverse transform to an image
 @param c0 Samples for luminance component
@@ -68,7 +62,7 @@ Apply a reversible multi-component inverse transform to an image
 @param c2 Samples for blue chrominance component
 @param n Number of samples for each component
 */
-void opj_mct_decode(OPJ_INT32* OPJ_RESTRICT c0, OPJ_INT32* OPJ_RESTRICT c1, OPJ_INT32* OPJ_RESTRICT c2, OPJ_UINT32 n);
+void opj_mct_decode(OPJ_INT32 *c0, OPJ_INT32 *c1, OPJ_INT32 *c2, OPJ_UINT32 n);
 /**
 Get norm of the basis function used for the reversible multi-component transform
 @param compno Number of the component (0->Y, 1->U, 2->V)
@@ -83,7 +77,7 @@ Apply an irreversible multi-component transform to an image
 @param c2 Samples blue component
 @param n Number of samples for each component
 */
-void opj_mct_encode_real(OPJ_INT32* OPJ_RESTRICT c0, OPJ_INT32* OPJ_RESTRICT c1, OPJ_INT32* OPJ_RESTRICT c2, OPJ_UINT32 n);
+void opj_mct_encode_real(OPJ_INT32 *c0, OPJ_INT32 *c1, OPJ_INT32 *c2, OPJ_UINT32 n);
 /**
 Apply an irreversible multi-component inverse transform to an image
 @param c0 Samples for luminance component
@@ -91,7 +85,7 @@ Apply an irreversible multi-component inverse transform to an image
 @param c2 Samples for blue chrominance component
 @param n Number of samples for each component
 */
-void opj_mct_decode_real(OPJ_FLOAT32* OPJ_RESTRICT c0, OPJ_FLOAT32* OPJ_RESTRICT c1, OPJ_FLOAT32* OPJ_RESTRICT c2, OPJ_UINT32 n);
+void opj_mct_decode_real(OPJ_FLOAT32* c0, OPJ_FLOAT32* c1, OPJ_FLOAT32* c2, OPJ_UINT32 n);
 /**
 Get norm of the basis function used for the irreversible multi-component transform
 @param compno Number of the component (0->Y, 1->U, 2->V)

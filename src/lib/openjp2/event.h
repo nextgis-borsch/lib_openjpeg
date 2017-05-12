@@ -1,11 +1,6 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
- * Copyright (c) 2008, 2011-2012, Centre National d'Etudes Spatiales (CNES), FR 
+ * Copyright (c) 2008;2011-2012, Centre National d'Etudes Spatiales (CNES), France 
  * Copyright (c) 2012, CS Systemes d'Information, France
  * All rights reserved.
  *
@@ -94,12 +89,6 @@ OPJ_BOOL opj_event_msg(opj_event_mgr_t* event_mgr, OPJ_INT32 event_type, const c
  * Set the event manager with the default callback function for the 3 levels.
  */
 void opj_set_default_event_handler(opj_event_mgr_t * p_manager);
-
-/*
-#ifdef __GNUC__
-#pragma GCC poison printf fprintf
-#endif
-*/
 
 /*@}*/
 

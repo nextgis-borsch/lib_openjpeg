@@ -1,9 +1,4 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
  * Copyright (c) 2003-2005, Francois Devaux and Antonin Descampe
@@ -484,7 +479,6 @@ int t2_decode_packet(opj_t2_t* t2, unsigned char *src, int len, opj_tcd_tile_t *
 	if (tcp->csty & J3D_CP_CSTY_EPH) {
 		if ((*hd) != 0xff || (*(hd + 1) != 0x92)) {
 			opj_event_msg(t2->cinfo, EVT_ERROR, "Expected EPH marker\n");
-			return -999;
 		} else {
 			hd += 2;
 		}

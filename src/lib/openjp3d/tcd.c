@@ -1,15 +1,10 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
  * Copyright (c) 2003-2005, Francois Devaux and Antonin Descampe
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
  * Copyright (c) 2002-2005, Communications and remote sensing Laboratory, Universite catholique de Louvain, Belgium
- * Copyright (c) 2006, MÃ³nica DÃ­ez, LPI-UVA, Spain
+ * Copyright (c) 2006, Mónica Díez, LPI-UVA, Spain
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1389,7 +1384,7 @@ bool tcd_rateallocate(opj_tcd_t *tcd, unsigned char *dest, int len, opj_volume_i
 /* ----------------------------------------------------------------------- */
 int tcd_encode_tile(opj_tcd_t *tcd, int tileno, unsigned char *dest, int len, opj_volume_info_t * volume_info) {
 	int compno;
-	int l = 0, i, npck = 0;
+	int l, i, npck = 0;
 	double encoding_time;
 	
 	opj_tcd_tile_t	*tile = NULL;
@@ -1601,7 +1596,7 @@ bool tcd_decode_tile(opj_tcd_t *tcd, unsigned char *src, int len, int tileno) {
 		
 		if (l == -999) {
 			eof = 1;
-			opj_event_msg(tcd->cinfo, EVT_ERROR, "Tcd_decode_tile: incomplete bitstream\n");
+			opj_event_msg(tcd->cinfo, EVT_ERROR, "Tcd_decode_tile: incomplete bistream\n");
 		}
 	
 		/*------------------TIER1-----------------*/
@@ -1631,7 +1626,7 @@ bool tcd_decode_tile(opj_tcd_t *tcd, unsigned char *src, int len, int tileno) {
 		golomb_destroy(gr);
 		if (l == -999) {
 			eof = 1;
-			opj_event_msg(tcd->cinfo, EVT_ERROR, "Tcd_decode_tile: incomplete bitstream\n");
+			opj_event_msg(tcd->cinfo, EVT_ERROR, "Tcd_decode_tile: incomplete bistream\n");
 		}
 		*/
 	} 

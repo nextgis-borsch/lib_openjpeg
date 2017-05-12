@@ -1,9 +1,4 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
  * Copyright (c) 2003-2005, Francois Devaux and Antonin Descampe
@@ -363,16 +358,13 @@ static bool pi_next_cprl(opj_pi_iterator_t * pi) {
 		comp = &pi->comps[pi->compno];
 		pi->dx = 0;
 		pi->dy = 0;
-		pi->dz = 0;
 		for (resno = 0; resno < comp->numresolution[0]; resno++) {
-			int dx, dy, dz;
+			int dx, dy;
 			res = &comp->resolutions[resno];
 			dx = comp->dx * (1 << (res->pdx + comp->numresolution[0] - 1 - resno));
-			dy = comp->dy * (1 << (res->pdy + comp->numresolution[1] - 1 - resno));
-			dz = comp->dz * (1 << (res->pdz + comp->numresolution[2] - 1 - resno));
+			dy = comp->dy * (1 << (res->pdy + comp->numresolution[0] - 1 - resno));
 			pi->dx = !pi->dx ? dx : int_min(pi->dx, dx);
 			pi->dy = !pi->dy ? dy : int_min(pi->dy, dy);
-			pi->dz = !pi->dz ? dz : int_min(pi->dz, dz);
 		}
 	for (pi->z = pi->tz0; pi->z < pi->tz1; pi->z += pi->dz - (pi->z % pi->dz)) {
 		for (pi->y = pi->ty0; pi->y < pi->ty1; pi->y += pi->dy - (pi->y % pi->dy)) {
@@ -530,7 +522,7 @@ opj_pi_iterator_t *pi_create(opj_volume_t *volume, opj_cp_t *cp, int tileno) {
 				}
 				levelnox = comp->numresolution[0] - 1 - resno;
 				levelnoy = comp->numresolution[1] - 1 - resno;
-        levelnoz = comp->numresolution[2] - 1 - resno;
+                levelnoz = comp->numresolution[2] - 1 - resno;
 				if (levelnoz < 0) levelnoz = 0; 
 				diff = comp->numresolution[0] - comp->numresolution[2];
 

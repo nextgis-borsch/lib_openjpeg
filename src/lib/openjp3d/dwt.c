@@ -1,9 +1,4 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
  * Copyright (c) 2003-2005, Francois Devaux and Antonin Descampe
@@ -63,7 +58,7 @@
 
 /** @name Local static functions */
 /*@{*/
-/*unsigned int ops;*/
+unsigned int ops;
 /**
 Forward lazy transform (horizontal)
 */
@@ -89,12 +84,12 @@ Inverse lazy transform (axial)
 */
 static void dwt_interleave_z(int *a, int *b, int dn, int sn, int xy, int cas);
 /**
-Forward 5-3 wavelet transform in 1-D
+Forward 5-3 wavelet tranform in 1-D
 */
 static void dwt_encode_53(int *a, int dn, int sn, int cas);
 static void dwt_encode_97(int *a, int dn, int sn, int cas);
 /**
-Inverse 5-3 wavelet transform in 1-D
+Inverse 5-3 wavelet tranform in 1-D
 */
 static void dwt_decode_53(int *a, int dn, int sn, int cas);
 static void dwt_decode_97(int *a, int dn, int sn, int cas);
@@ -333,7 +328,7 @@ static void dwt_interleave_z(int *a, int *b, int dn, int sn, int xy, int cas) {
 
 
 /* <summary>                            */
-/* Forward 5-3 or 9-7 wavelet transform in 1-D. */
+/* Forward 5-3 or 9-7 wavelet tranform in 1-D. */
 /* </summary>                           */
 static void dwt_encode_53(int *a, int dn, int sn, int cas) {
 	int i;
@@ -409,7 +404,7 @@ static void dwt_encode_97(int *a, int dn, int sn, int cas) {
 		}
 }
 /* <summary>                            */
-/* Inverse 5-3 or 9-7 wavelet transform in 1-D. */
+/* Inverse 5-3 or 9-7 wavelet tranform in 1-D. */
 /* </summary>                           */ 
 static void dwt_decode_53(int *a, int dn, int sn, int cas) {
 	int i;
@@ -661,7 +656,7 @@ static void dwt_encode_stepsize(int stepsize, int numbps, opj_stepsize_t *bandno
 ==========================================================
 */
 /* <summary>                            */
-/* Forward 5-3 wavelet transform in 3-D. */
+/* Forward 5-3 wavelet tranform in 3-D. */
 /* </summary>                           */
 void dwt_encode(opj_tcd_tilecomp_t * tilec, int dwtid[3]) {
 	int i, j, k;
@@ -673,7 +668,7 @@ void dwt_encode(opj_tcd_tilecomp_t * tilec, int dwtid[3]) {
 	int *bj = NULL;
 	int *cj = NULL;
 	
-	/*ops = 0;*/
+	ops = 0;
 
 	memset(flagnorm,0,8000*sizeof(int));
 	w = tilec->x1-tilec->x0;
@@ -792,7 +787,7 @@ void dwt_encode(opj_tcd_tilecomp_t * tilec, int dwtid[3]) {
 
 
 /* <summary>                            */
-/* Inverse 5-3 wavelet transform in 3-D. */
+/* Inverse 5-3 wavelet tranform in 3-D. */
 /* </summary>                           */
 void dwt_decode(opj_tcd_tilecomp_t * tilec, int stops[3], int dwtid[3]) {
 	int i, j, k;

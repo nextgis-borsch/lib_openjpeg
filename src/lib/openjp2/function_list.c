@@ -1,9 +1,4 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
  * Copyright (c) 2008, Jerome Fimes, Communications & Systemes <jerome.fimes@c-s.fr>
  * All rights reserved.
  *
@@ -39,19 +34,22 @@
 opj_procedure_list_t *  opj_procedure_list_create()
 {
         /* memory allocation */
-        opj_procedure_list_t * l_validation = (opj_procedure_list_t *) opj_calloc(1,sizeof(opj_procedure_list_t));
+        opj_procedure_list_t * l_validation = (opj_procedure_list_t *) opj_malloc(sizeof(opj_procedure_list_t));
         if (! l_validation)
         {
                 return 00;
         }
         /* initialization */
+        memset(l_validation,0,sizeof(opj_procedure_list_t));
         l_validation->m_nb_max_procedures = OPJ_VALIDATION_SIZE;
-        l_validation->m_procedures = (opj_procedure*)opj_calloc(OPJ_VALIDATION_SIZE, sizeof(opj_procedure));
+        l_validation->m_procedures = (opj_procedure*)opj_malloc(
+                OPJ_VALIDATION_SIZE * sizeof(opj_procedure));
         if (! l_validation->m_procedures)
         {
                 opj_free(l_validation);
                 return 00;
         }
+        memset(l_validation->m_procedures,0,OPJ_VALIDATION_SIZE * sizeof(opj_procedure));
         return l_validation;
 }
 
@@ -69,11 +67,8 @@ void  opj_procedure_list_destroy(opj_procedure_list_t * p_list)
         opj_free(p_list);
 }
 
-OPJ_BOOL opj_procedure_list_add_procedure (opj_procedure_list_t * p_validation_list, opj_procedure p_procedure, opj_event_mgr_t* p_manager )
+OPJ_BOOL opj_procedure_list_add_procedure (opj_procedure_list_t * p_validation_list, opj_procedure p_procedure)
 {
-	
-        assert(p_manager != NULL);
-	
         if (p_validation_list->m_nb_max_procedures == p_validation_list->m_nb_procedures)
         {
                 opj_procedure * new_procedures;
@@ -87,7 +82,9 @@ OPJ_BOOL opj_procedure_list_add_procedure (opj_procedure_list_t * p_validation_l
                         opj_free(p_validation_list->m_procedures);
                         p_validation_list->m_nb_max_procedures = 0;
                         p_validation_list->m_nb_procedures = 0;
-                        opj_event_msg(p_manager, EVT_ERROR, "Not enough memory to add a new validation procedure\n");
+                        /* opj_event_msg(p_manager, EVT_ERROR, "Not enough memory to add a new validation procedure\n"); */
+                        fprintf(stderr, "Not enough memory to add a new validation procedure\n");
+                        
                         return OPJ_FALSE;
                 }
                 else

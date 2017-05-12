@@ -1,8 +1,8 @@
 /*
  * $Id$
  *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
+ * Copyright (c) 2002-2011, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2011, Professor Benoit Macq
  * Copyright (c) 2010-2011, Kaori Hagihara 
  * Copyright (c) 2011,      Lucian Corlaciu, GSoC
  * All rights reserved.
@@ -264,7 +264,7 @@ void print_queryparam( query_param_t query_param)
   }
 
   fprintf( logstream, "\t req-box-prop\n");
-  for( i=0; i<MAX_NUMOFBOX && query_param.box_type[i][0]!=0; i++){
+  for( i=0; query_param.box_type[i][0]!=0 && i<MAX_NUMOFBOX; i++){
     fprintf( logstream, "\t\t box_type: %.4s limit: %d w:%d s:%d g:%d a:%d priority:%d\n", query_param.box_type[i], query_param.limit[i], query_param.w[i], query_param.s[i], query_param.g[i], query_param.a[i], query_param.priority[i]);
   }
   

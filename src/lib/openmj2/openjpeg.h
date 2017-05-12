@@ -1,15 +1,9 @@
  /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
+ * Copyright (c) 2002-2007, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2007, Professor Benoit Macq
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2003-2007, Francois-Olivier Devaux 
- * Copyright (c) 2003-2014, Antonin Descampe
+ * Copyright (c) 2003-2007, Francois-Olivier Devaux and Antonin Descampe
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
  * Copyright (c) 2006-2007, Parvatha Elangovan
  * Copyright (c) 2010-2011, Kaori Hagihara
@@ -62,7 +56,7 @@ The following ifdef block is the standard way of creating macros which make expo
 from a DLL simpler. All files within this DLL are compiled with the OPJ_EXPORTS
 symbol defined on the command line. this symbol should not be defined on any project
 that uses this DLL. This way any other project whose source files include this file see 
-OPJ_API functions as being imported from a DLL, whereas this DLL sees symbols
+OPJ_API functions as being imported from a DLL, wheras this DLL sees symbols
 defined with this macro as being exported.
 */
 #if defined(OPJ_EXPORTS) || defined(DLL_EXPORT)

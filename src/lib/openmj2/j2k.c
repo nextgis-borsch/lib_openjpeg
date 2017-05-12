@@ -1,15 +1,9 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
+ * Copyright (c) 2002-2007, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2007, Professor Benoit Macq
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2003-2007, Francois-Olivier Devaux 
- * Copyright (c) 2003-2014, Antonin Descampe
+ * Copyright (c) 2003-2007, Francois-Olivier Devaux and Antonin Descampe
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
  * Copyright (c) 2006-2007, Parvatha Elangovan
  * Copyright (c) 2010-2011, Kaori Hagihara
@@ -1543,6 +1537,24 @@ static void j2k_read_sod(opj_j2k_t *j2k) {
 	if (len == cio_numbytesleft(cio) + 1) {
 		truncate = 1;		/* Case of a truncate codestream */
 	}	
+
+   {/* chop padding bytes: */
+    unsigned char *s, *e; 
+
+    s = cio_getbp(cio);
+    e = s + len;
+
+  if(len > 8) s = e - 8;
+
+  if(e[-2] == 0x00 && e[-1] == 0x00) /* padding bytes */
+  {
+	while(e > s)
+ {
+	if(e[-2] == 0xff && e[-1] == 0xd9)	break;
+  --len; --e; truncate = 1;
+ }
+  }
+   }
 
 	data = j2k->tile_data[curtileno];
 	data = (unsigned char*) opj_realloc(data, (j2k->tile_len[curtileno] + len) * sizeof(unsigned char));

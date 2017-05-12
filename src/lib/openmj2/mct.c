@@ -1,15 +1,9 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
+ * Copyright (c) 2002-2007, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2007, Professor Benoit Macq
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2003-2007, Francois-Olivier Devaux 
- * Copyright (c) 2003-2014, Antonin Descampe
+ * Copyright (c) 2003-2007, Francois-Olivier Devaux and Antonin Descampe
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
  * All rights reserved.
  *
@@ -52,7 +46,7 @@ static const double mct_norms[3] = { 1.732, .8292, .8292 };
 static const double mct_norms_real[3] = { 1.732, 1.805, 1.573 };
 
 /* <summary> */
-/* Forward reversible MCT. */
+/* Foward reversible MCT. */
 /* </summary> */
 void mct_encode(
 		int* restrict c0,
@@ -105,7 +99,7 @@ double mct_getnorm(int compno) {
 }
 
 /* <summary> */
-/* Forward irreversible MCT. */
+/* Foward irreversible MCT. */
 /* </summary> */
 void mct_encode_real(
 		int* restrict c0,

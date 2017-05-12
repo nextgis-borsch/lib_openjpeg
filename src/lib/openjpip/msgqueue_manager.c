@@ -1,8 +1,8 @@
 /*
  * $Id$
  *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
+ * Copyright (c) 2002-2011, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2011, Professor Benoit Macq
  * Copyright (c) 2010-2011, Kaori Hagihara
  * Copyright (c) 2011,      Lucian Corlaciu, GSoC
  * All rights reserved.
@@ -692,7 +692,7 @@ placeholder_param_t * parse_phld( Byte_t *datastream, Byte8_t metalength)
   phld = (placeholder_param_t *)opj_malloc( sizeof(placeholder_param_t));
   
   phld->LBox = big4( datastream);
-  strncpy( phld->TBox, "phld", 4);
+  strcpy( phld->TBox, "phld");
   phld->Flags = big4( datastream+8);
   phld->OrigID = big8( datastream+12);
   phld->OrigBHlen = (Byte_t)(metalength - 20);

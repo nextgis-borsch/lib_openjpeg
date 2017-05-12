@@ -1,11 +1,6 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
+ * Copyright (c) 2002-2007, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2007, Professor Benoit Macq
  * Copyright (c) 2003-2007, Francois-Olivier Devaux 
  * All rights reserved.
  *
@@ -69,7 +64,7 @@ int write_index_file(opj_codestream_info_t *cstr_info, char *index) {
 		return 1;
 	}
 	
-	if (cstr_info->tile[0].distotile > 0.0)
+	if (cstr_info->tile[0].distotile)
 		disto_on = 1;
 	else 
 		disto_on = 0;

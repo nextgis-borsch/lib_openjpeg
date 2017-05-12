@@ -1,15 +1,9 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
+ * Copyright (c) 2002-2007, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2007, Professor Benoit Macq
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2003-2007, Francois-Olivier Devaux 
- * Copyright (c) 2003-2014, Antonin Descampe
+ * Copyright (c) 2003-2007, Francois-Olivier Devaux and Antonin Descampe
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
  * Copyright (c) 2006-2007, Parvatha Elangovan
  * All rights reserved.
@@ -55,7 +49,7 @@
 #include <strings.h>
 #endif /* _WIN32 */
 
-#include "opj_apps_config.h"
+#include "opj_config.h"
 #include "openjpeg.h"
 #include "opj_getopt.h"
 #include "convert.h"
@@ -199,7 +193,7 @@ static void encode_help_display(void) {
 	fprintf(stdout,"                 Indicate multiple modes by adding their values. \n");
 	fprintf(stdout,"                 ex: RESTART(4) + RESET(2) + SEGMARK(32) = -M 38\n");
 	fprintf(stdout,"\n");
-	fprintf(stdout,"-TP          : divide packets of every tile into tile-parts (-TP R) [R, L, C]\n");
+	fprintf(stdout,"-TP          : devide packets of every tile into tile-parts (-TP R) [R, L, C]\n");
 	fprintf(stdout,"\n");
 	fprintf(stdout,"-x           : create an index file *.Idx (-x index_name.Idx) \n");
 	fprintf(stdout,"\n");
@@ -1633,7 +1627,7 @@ int main(int argc, char **argv) {
 						return 1;
 					}
 					break;
-#ifdef OPJ_HAVE_LIBTIFF
+#ifdef HAVE_LIBTIFF
 				case TIF_DFMT:
 					image = tiftoimage(parameters.infile, &parameters);
 					if (!image) {
@@ -1641,7 +1635,7 @@ int main(int argc, char **argv) {
 						return 1;
 					}
 				break;
-#endif /* OPJ_HAVE_LIBTIFF */
+#endif /* HAVE_LIBTIFF */
 				case RAW_DFMT:
 					image = rawtoimage(parameters.infile, &parameters, &raw_cp);
 					if (!image) {
@@ -1657,7 +1651,7 @@ int main(int argc, char **argv) {
 						return 1;
 					}
 				break;
-#ifdef OPJ_HAVE_LIBPNG
+#ifdef HAVE_LIBPNG
 				case PNG_DFMT:
 					image = pngtoimage(parameters.infile, &parameters);
 					if (!image) {
@@ -1665,10 +1659,10 @@ int main(int argc, char **argv) {
 						return 1;
 					}
 					break;
-#endif /* OPJ_HAVE_LIBPNG */
+#endif /* HAVE_LIBPNG */
 		}
 /* Can happen if input file is TIFF or PNG 
- * and OPJ_HAVE_LIBTIF or OPJ_HAVE_LIBPNG is undefined
+ * and HAVE_LIBTIF or HAVE_LIBPNG is undefined
 */
 			if( !image)
 		   {

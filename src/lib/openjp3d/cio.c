@@ -1,9 +1,4 @@
 /*
- * The copyright in this software is being made available under the 2-clauses 
- * BSD License, included below. This software may be subject to other third 
- * party and contributor rights, including patent rights, and no such rights
- * are granted under this license.
- *
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
  * Copyright (c) 2003-2005, Francois Devaux and Antonin Descampe
@@ -63,7 +58,6 @@ opj_cio_t* OPJ_CALLCONV opj_cio_open(opj_common_ptr cinfo, unsigned char *buffer
 		cio->length = cp->tdx * cp->tdy * cp->tdz * cp->tw * cp->th * cp->tl * 4;
 		cio->buffer = (unsigned char *)opj_malloc(cio->length);
 		if(!cio->buffer) {
-			opj_event_msg(cio->cinfo, EVT_ERROR, "Error allocating memory for compressed bitstream\n");
 			opj_free(cio);
 			return NULL;
 		}
