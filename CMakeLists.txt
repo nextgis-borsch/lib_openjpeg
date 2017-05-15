@@ -257,6 +257,9 @@ configure_file(
 
 ### Borsch export.
 if (REGISTER_PACKAGE)
+    # Replace the path so not to modify a "template" PackageConfig.cmake.in file.
+    set(INSTALL_INC_DIR ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+    
     export(TARGETS ${PROJECT_NAME} FILE ${PROJECT_NAME}-exports.cmake)
 
     set(EXPORT_PACKAGE_NAME OpenJPEG)
