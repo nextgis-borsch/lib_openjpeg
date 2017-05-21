@@ -1,0 +1,13 @@
+/Users/Bishop/work/projects/borsch/lib_openjpeg/inst/Library/Frameworks/openjpeg.framework/Versions/2/Resources/docs/LICENSE
+/Users/Bishop/work/projects/borsch/lib_openjpeg/inst/Library/Frameworks/openjpeg.framework/Headers
+/Users/Bishop/work/projects/borsch/lib_openjpeg/inst/Library/Frameworks/openjpeg.framework/openjpeg
+/Users/Bishop/work/projects/borsch/lib_openjpeg/inst/Library/Frameworks/openjpeg.framework/Resources
+/Users/Bishop/work/projects/borsch/lib_openjpeg/inst/Library/Frameworks/openjpeg.framework/Versions/2/Headers/openjpeg.h
+/Users/Bishop/work/projects/borsch/lib_openjpeg/inst/Library/Frameworks/openjpeg.framework/Versions/2/Headers/opj_config.h
+/Users/Bishop/work/projects/borsch/lib_openjpeg/inst/Library/Frameworks/openjpeg.framework/Versions/2/Headers/opj_stdint.h
+/Users/Bishop/work/projects/borsch/lib_openjpeg/inst/Library/Frameworks/openjpeg.framework/Versions/2/openjpeg
+/Users/Bishop/work/projects/borsch/lib_openjpeg/inst/Library/Frameworks/openjpeg.framework/Versions/2/Resources/Info.plist
+/Users/Bishop/work/projects/borsch/lib_openjpeg/inst/Library/Frameworks/openjpeg.framework/Versions/Current
+/Users/Bishop/work/projects/borsch/lib_openjpeg/inst/Library/Frameworks/openjpeg.framework/Versions/2/Headers/openjpeg-2.1/openjpeg.h
+/Users/Bishop/work/projects/borsch/lib_openjpeg/inst/Library/Frameworks/openjpeg.framework/Versions/2/Headers/openjpeg-2.1/opj_stdint.h
+/Users/Bishop/work/projects/borsch/lib_openjpeg/inst/Library/Frameworks/openjpeg.framework/Versions/2/Headers/openjpeg-2.1/opj_config.h
