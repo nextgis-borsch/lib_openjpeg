@@ -15,3 +15,7 @@ cmake_install.cmake
 
 # Ignore directories made by `make`.
 /bin/
+
+# Borsch
+build*/
+inst/

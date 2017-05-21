@@ -53,7 +53,7 @@ if(OSX_FRAMEWORK)
 else()
     set(INSTALL_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR}/${OPENJPEG_INSTALL_SUBDIR} CACHE INTERNAL "Installation directory for headers" FORCE)
     set(INSTALL_SHARE_DIR ${CMAKE_INSTALL_DATADIR}/${OPENJPEG_INSTALL_SUBDIR} CACHE INTERNAL "Installation directory for share data" FORCE)
-    set(INSTALL_INC_DIR_PACKAGE ${CMAKE_INSTALL_INCLUDEDIR} CACHE INTERNAL "Installation directory for headers in package" FORCE)
+    set(INSTALL_INC_DIR_PACKAGE ${CMAKE_INSTALL_FULL_INCLUDEDIR} CACHE INTERNAL "Installation directory for headers in package" FORCE)
 endif()
 
 report_version(${PROJECT_NAME} ${VERSION})
