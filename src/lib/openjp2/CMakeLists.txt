@@ -3,6 +3,7 @@
 include_regular_expression("^.*$")
 
 configure_file(opj_config.h.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/opj_config.h @ONLY)
+configure_file(opj_config_private.h.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/opj_config_private.h @ONLY)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -27,9 +28,35 @@ set(CSOURCES
     tcd.c
     tgt.c
     function_list.c
+    opj_malloc.c
 )
 
-set(HEADERS
+set(HEADERS_PRIV
+    bio.h
+    cio.h
+    dwt.h
+    event.h
+    image.h
+    invert.h
+    j2k.h
+    jp2.h
+    mct.h
+    mqc.h
+    opj_clock.h
+    pi.h
+    raw.h
+    t1.h
+    t2.h
+    tcd.h
+    tgt.h
+    function_list.h
+    opj_codec.h
+    opj_includes.h
+    opj_intmath.h
+    opj_malloc.h
+)
+
+set(HHEADERS
     openjpeg.h opj_stdint.h ${CMAKE_CURRENT_BINARY_DIR}/opj_config.h
 )
 
@@ -46,7 +73,7 @@ set(HEADERS
 ###endif()
 
 if(BUILD_SHARED_LIBS)
-    add_library(${OPENJPEG_LIBRARY_NAME} SHARED ${CSOURCES} ${HHEADERS})
+    add_library(${OPENJPEG_LIBRARY_NAME} SHARED ${CSOURCES} ${HHEADERS} ${HEADERS_PRIV})
     set_target_properties (${OPENJPEG_LIBRARY_NAME} PROPERTIES
         VERSION ${VERSION}
         SOVERSION ${SOVERSION}
@@ -56,23 +83,25 @@ if(BUILD_SHARED_LIBS)
         set_target_properties(${OPENJPEG_LIBRARY_NAME} PROPERTIES IMPORT_SUFFIX "_i.lib")
     endif()
 elseif(OSX_FRAMEWORK)
-    add_library(${OPENJPEG_LIBRARY_NAME} SHARED ${CSOURCES} ${HHEADERS})
+    add_library(${OPENJPEG_LIBRARY_NAME} SHARED ${CSOURCES} ${HHEADERS} ${HEADERS_PRIV})
     set_target_properties(${OPENJPEG_LIBRARY_NAME} PROPERTIES
       FRAMEWORK TRUE
       FRAMEWORK_VERSION ${FRAMEWORK_VERSION}
       MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${VERSION}
       MACOSX_FRAMEWORK_BUNDLE_VERSION ${VERSION}
-      MACOSX_FRAMEWORK_IDENTIFIER org.opencad.opencad
+      MACOSX_FRAMEWORK_IDENTIFIER org.openjpeg.openjpeg
       XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
       PUBLIC_HEADER "${HHEADERS}"
       VERSION ${VERSION}
       SOVERSION ${SOVERSION}
       )
 else()
-    add_library(${OPENJPEG_LIBRARY_NAME} STATIC ${CSOURCES} ${HHEADERS})
+    add_library(${OPENJPEG_LIBRARY_NAME} STATIC ${CSOURCES} ${HHEADERS} ${HEADERS_PRIV})
 endif()
 
-target_link_libraries(${OPENJPEG_LIBRARY_NAME} ${M_LIB})
+if(M_LIB)
+    target_link_libraries(${OPENJPEG_LIBRARY_NAME} ${M_LIB})
+endif()
 
 if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
     install(TARGETS ${OPENJPEG_LIBRARY_NAME}

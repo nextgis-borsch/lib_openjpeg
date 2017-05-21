@@ -1,4 +1,9 @@
 /*
+ * The copyright in this software is being made available under the 2-clauses 
+ * BSD License, included below. This software may be subject to other third 
+ * party and contributor rights, including patent rights, and no such rights
+ * are granted under this license.
+ *
  * Copyright (c) 2008, Jerome Fimes, Communications & Systemes <jerome.fimes@c-s.fr>
  * All rights reserved.
  *
@@ -90,7 +95,7 @@ void  opj_procedure_list_destroy(opj_procedure_list_t * p_list);
  *
  * @return	OPJ_TRUE if the procedure could be added.
  */
-OPJ_BOOL opj_procedure_list_add_procedure (opj_procedure_list_t * p_validation_list, opj_procedure p_procedure);
+OPJ_BOOL opj_procedure_list_add_procedure (opj_procedure_list_t * p_validation_list, opj_procedure p_procedure, opj_event_mgr_t* p_manager);
 
 /**
  * Gets the number of validation procedures.

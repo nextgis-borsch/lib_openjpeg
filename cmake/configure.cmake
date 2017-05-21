@@ -56,26 +56,58 @@ if(CMAKE_COMPILER_IS_GNUCC)
 set(CMAKE_C_FLAGS_RELEASE "-ffast-math ${CMAKE_C_FLAGS_RELEASE}")
 endif()
 
+# Check if some include files are provided by the system
+include(EnsureFileInclude)
+# These files are mandatory
+ensure_file_include("string.h"   HAVE_STRING_H YES)
+ensure_file_include("memory.h"   HAVE_MEMORY_H YES)
+ensure_file_include("stdlib.h"   HAVE_STDLIB_H YES)
+ensure_file_include("stdio.h"    HAVE_STDIO_H  YES)
+ensure_file_include("math.h"     HAVE_MATH_H   YES)
+ensure_file_include("float.h"    HAVE_FLOAT_H  YES)
+ensure_file_include("time.h"     HAVE_TIME_H   YES)
+ensure_file_include("stdarg.h"   HAVE_STDARG_H YES)
+ensure_file_include("ctype.h"    HAVE_CTYPE_H  YES)
+ensure_file_include("assert.h"   HAVE_ASSERT_H YES)
+
+# For the following files, we provide an alternative, they are not mandatory
+ensure_file_include("stdint.h"   OPJ_HAVE_STDINT_H   NO)
+ensure_file_include("inttypes.h" OPJ_HAVE_INTTYPES_H NO)
+
 #-----------------------------------------------------------------------------
 # opj_config.h generation (1/2)
 include (CheckIncludeFile)
-CHECK_INCLUDE_FILE("strings.h"      HAVE_STRINGS_H)
-CHECK_INCLUDE_FILE("inttypes.h"     HAVE_INTTYPES_H)
-CHECK_INCLUDE_FILE("memory.h"       HAVE_MEMORY_H)
-CHECK_INCLUDE_FILE("stdint.h"       HAVE_STDINT_H)
-CHECK_INCLUDE_FILE("stdlib.h"       HAVE_STDLIB_H)
-CHECK_INCLUDE_FILE("string.h"       HAVE_STRING_H)
-CHECK_INCLUDE_FILE("sys/stat.h"     HAVE_SYS_STAT_H)
-CHECK_INCLUDE_FILE("sys/types.h"    HAVE_SYS_TYPES_H)
-CHECK_INCLUDE_FILE("unistd.h"       HAVE_UNISTD_H)
+check_include_file("strings.h"      HAVE_STRINGS_H)
+check_include_file("sys/stat.h"     HAVE_SYS_STAT_H)
+check_include_file("sys/types.h"    HAVE_SYS_TYPES_H)
+check_include_file("unistd.h"       HAVE_UNISTD_H)
+check_include_file("malloc.h"       OPJ_HAVE_MALLOC_H)
+
 # ssize_t
 include(CheckTypeSize)
 CHECK_TYPE_SIZE(ssize_t     SSIZE_T)
+
+include(CheckSymbolExists)
+# _aligned_alloc https://msdn.microsoft.com/en-us/library/8z34s9c6.aspx
+check_symbol_exists(_aligned_malloc malloc.h OPJ_HAVE__ALIGNED_MALLOC)
+# posix_memalign (needs _POSIX_C_SOURCE >= 200112L on Linux)
+set(CMAKE_REQUIRED_DEFINITIONS -D_POSIX_C_SOURCE=200112L)
+check_symbol_exists(posix_memalign stdlib.h OPJ_HAVE_POSIX_MEMALIGN)
+unset(CMAKE_REQUIRED_DEFINITIONS)
+# memalign (obsolete)
+check_symbol_exists(memalign malloc.h OPJ_HAVE_MEMALIGN)
 
 # Enable Large file support
 include(TestLargeFiles)
 OPJ_TEST_LARGE_FILES(OPJ_HAVE_LARGEFILES)
 
 find_library(M_LIB m)
+
+if(HAVE_STDLIB_H)
+    set(OPJ_HAVE_STDINT_H 1)
+endif()
+if(HAVE_INTTYPES_H)
+    set(OPJ_HAVE_INTTYPES_H 1)
+endif()
 
 configure_file(${CMAKE_SOURCE_DIR}/cmake/uninstall.cmake.in ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)

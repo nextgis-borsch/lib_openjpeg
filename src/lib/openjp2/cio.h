@@ -1,11 +1,17 @@
 /*
- * Copyright (c) 2002-2007, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2007, Professor Benoit Macq
+ * The copyright in this software is being made available under the 2-clauses 
+ * BSD License, included below. This software may be subject to other third 
+ * party and contributor rights, including patent rights, and no such rights
+ * are granted under this license.
+ *
+ * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2014, Professor Benoit Macq
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2003-2007, Francois-Olivier Devaux and Antonin Descampe
+ * Copyright (c) 2003-2007, Francois-Olivier Devaux 
+ * Copyright (c) 2003-2014, Antonin Descampe
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
- * Copyright (c) 2008;2011-2012, Centre National d'Etudes Spatiales (CNES), France 
+ * Copyright (c) 2008, 2011-2012, Centre National d'Etudes Spatiales (CNES), FR 
  * Copyright (c) 2012, CS Systemes d'Information, France
  * All rights reserved.
  *
@@ -43,7 +49,7 @@ The functions in CIO.C have for goal to realize a byte input / output process.
 /** @defgroup CIO CIO - byte input-output stream */
 /*@{*/
 
-#include "opj_config.h"
+#include "opj_config_private.h"
 
 /* ----------------------------------------------------------------------- */
 
@@ -64,16 +70,10 @@ The functions in CIO.C have for goal to realize a byte input / output process.
 #endif
 
 
-
-typedef enum
-{
-	opj_signed_sentinel		= -1, /* do not use in code */
-	opj_stream_e_output		= 0x1,
-	opj_stream_e_input		= 0x2,
-	opj_stream_e_end		= 0x4,
-	opj_stream_e_error		= 0x8
-}
-opj_stream_flag ;
+#define OPJ_STREAM_STATUS_OUTPUT  0x1U
+#define OPJ_STREAM_STATUS_INPUT   0x2U
+#define OPJ_STREAM_STATUS_END     0x4U
+#define OPJ_STREAM_STATUS_ERROR   0x8U
 
 /**
 Byte input-output stream.
@@ -84,6 +84,13 @@ typedef struct opj_stream_private
 	 * User data, be it files, ... The actual data depends on the type of the stream.
 	 */
 	void *					m_user_data;
+
+	/**
+	 * Pointer to function to free m_user_data (NULL at initialization)
+	 * when destroying the stream. If pointer is NULL the function is not
+	 * called and the m_user_data is not freed (even if non-NULL).
+	 */
+	opj_stream_free_user_data_fn		m_free_user_data_fn;
 
 	/**
 	 * User data length
@@ -149,8 +156,9 @@ typedef struct opj_stream_private
 
 	/**
 	 * Flags to tell the status of the stream.
+	 * Used with OPJ_STREAM_STATUS_* defines.
 	 */
-	opj_stream_flag m_status;
+	OPJ_UINT32 m_status;
 
 }
 opj_stream_private_t;
@@ -171,7 +179,7 @@ void opj_write_bytes_BE (OPJ_BYTE * p_buffer, OPJ_UINT32 p_value, OPJ_UINT32 p_n
  * @param p_buffer		pointer the data buffer to read data from.
  * @param p_value		pointer to the value that will store the data.
  * @param p_nb_bytes	the nb bytes to read.
- * @return				the number of bytes read or -1 if an error occured.
+ * @return				the number of bytes read or -1 if an error occurred.
  */
 void opj_read_bytes_BE(const OPJ_BYTE * p_buffer, OPJ_UINT32 * p_value, OPJ_UINT32 p_nb_bytes);
 
@@ -180,7 +188,7 @@ void opj_read_bytes_BE(const OPJ_BYTE * p_buffer, OPJ_UINT32 * p_value, OPJ_UINT
  * @param p_buffer		pointer the data buffer to write data to.
  * @param p_value		the value to write
  * @param p_nb_bytes	the number of bytes to write
- * @return				the number of bytes written or -1 if an error occured
+ * @return				the number of bytes written or -1 if an error occurred
 */
 void opj_write_bytes_LE (OPJ_BYTE * p_buffer, OPJ_UINT32 p_value, OPJ_UINT32 p_nb_bytes);
 
@@ -189,7 +197,7 @@ void opj_write_bytes_LE (OPJ_BYTE * p_buffer, OPJ_UINT32 p_value, OPJ_UINT32 p_n
  * @param p_buffer		pointer the data buffer to read data from.
  * @param p_value		pointer to the value that will store the data.
  * @param p_nb_bytes	the nb bytes to read.
- * @return				the number of bytes read or -1 if an error occured.
+ * @return				the number of bytes read or -1 if an error occurred.
  */
 void opj_read_bytes_LE(const OPJ_BYTE * p_buffer, OPJ_UINT32 * p_value, OPJ_UINT32 p_nb_bytes);
 
@@ -256,7 +264,7 @@ void opj_write_float_BE(OPJ_BYTE * p_buffer, OPJ_FLOAT32 p_value);
  * @param		p_buffer	pointer to the data buffer that will receive the data.
  * @param		p_size		number of bytes to read.
  * @param		p_event_mgr	the user event manager to be notified of special events.
- * @return		the number of bytes read, or -1 if an error occured or if the stream is at the end.
+ * @return		the number of bytes read, or -1 if an error occurred or if the stream is at the end.
  */
 OPJ_SIZE_T opj_stream_read_data (opj_stream_private_t * p_stream,OPJ_BYTE * p_buffer, OPJ_SIZE_T p_size, struct opj_event_mgr * p_event_mgr);
 
@@ -266,7 +274,7 @@ OPJ_SIZE_T opj_stream_read_data (opj_stream_private_t * p_stream,OPJ_BYTE * p_bu
  * @param		p_buffer	pointer to the data buffer holds the data to be writtent.
  * @param		p_size		number of bytes to write.
  * @param		p_event_mgr	the user event manager to be notified of special events.
- * @return		the number of bytes writtent, or -1 if an error occured.
+ * @return		the number of bytes writtent, or -1 if an error occurred.
  */
 OPJ_SIZE_T opj_stream_write_data (opj_stream_private_t * p_stream,const OPJ_BYTE * p_buffer, OPJ_SIZE_T p_size, struct opj_event_mgr * p_event_mgr);
 
@@ -283,7 +291,7 @@ OPJ_BOOL opj_stream_flush (opj_stream_private_t * p_stream, struct opj_event_mgr
  * @param		p_stream	the stream to skip data from.
  * @param		p_size		the number of bytes to skip.
  * @param		p_event_mgr	the user event manager to be notified of special events.
- * @return		the number of bytes skipped, or -1 if an error occured.
+ * @return		the number of bytes skipped, or -1 if an error occurred.
  */
 OPJ_OFF_T opj_stream_skip (opj_stream_private_t * p_stream,OPJ_OFF_T p_size, struct opj_event_mgr * p_event_mgr);
 
@@ -311,7 +319,7 @@ OPJ_OFF_T opj_stream_get_number_byte_left (const opj_stream_private_t * p_stream
  * @param		p_stream	the stream to skip data from.
  * @param		p_size		the number of bytes to skip.
  * @param		p_event_mgr	the user event manager to be notified of special events.
- * @return		the number of bytes skipped, or -1 if an error occured.
+ * @return		the number of bytes skipped, or -1 if an error occurred.
  */
 OPJ_OFF_T opj_stream_write_skip (opj_stream_private_t * p_stream, OPJ_OFF_T p_size, struct opj_event_mgr * p_event_mgr);
 
@@ -320,7 +328,7 @@ OPJ_OFF_T opj_stream_write_skip (opj_stream_private_t * p_stream, OPJ_OFF_T p_si
  * @param		p_stream	the stream to skip data from.
  * @param		p_size		the number of bytes to skip.
  * @param		p_event_mgr	the user event manager to be notified of special events.
- * @return		the number of bytes skipped, or -1 if an error occured.
+ * @return		the number of bytes skipped, or -1 if an error occurred.
  */
 OPJ_OFF_T opj_stream_read_skip (opj_stream_private_t * p_stream, OPJ_OFF_T p_size, struct opj_event_mgr * p_event_mgr);
 
@@ -329,7 +337,7 @@ OPJ_OFF_T opj_stream_read_skip (opj_stream_private_t * p_stream, OPJ_OFF_T p_siz
  * @param		p_stream	the stream to skip data from.
  * @param		p_size		the number of bytes to skip.
  * @param		p_event_mgr	the user event manager to be notified of special events.
- * @return		OPJ_TRUE if success, or OPJ_FALSE if an error occured.
+ * @return		OPJ_TRUE if success, or OPJ_FALSE if an error occurred.
  */
 OPJ_BOOL opj_stream_read_seek (opj_stream_private_t * p_stream, OPJ_OFF_T p_size, struct opj_event_mgr * p_event_mgr);
 
@@ -338,7 +346,7 @@ OPJ_BOOL opj_stream_read_seek (opj_stream_private_t * p_stream, OPJ_OFF_T p_size
  * @param		p_stream	the stream to skip data from.
  * @param		p_size		the number of bytes to skip.
  * @param		p_event_mgr	the user event manager to be notified of special events.
- * @return		the number of bytes skipped, or -1 if an error occured.
+ * @return		the number of bytes skipped, or -1 if an error occurred.
  */
 OPJ_BOOL opj_stream_write_seek (opj_stream_private_t * p_stream, OPJ_OFF_T p_size, struct opj_event_mgr * p_event_mgr);
 

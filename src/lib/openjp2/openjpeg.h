@@ -1,9 +1,15 @@
  /*
- * Copyright (c) 2002-2007, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2007, Professor Benoit Macq
+ * The copyright in this software is being made available under the 2-clauses 
+ * BSD License, included below. This software may be subject to other third 
+ * party and contributor rights, including patent rights, and no such rights
+ * are granted under this license.
+ *
+ * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2014, Professor Benoit Macq
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2003-2007, Francois-Olivier Devaux and Antonin Descampe
+ * Copyright (c) 2003-2007, Francois-Olivier Devaux 
+ * Copyright (c) 2003-2014, Antonin Descampe
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
  * Copyright (c) 2006-2007, Parvatha Elangovan
  * Copyright (c) 2008, Jerome Fimes, Communications & Systemes <jerome.fimes@c-s.fr>
@@ -43,44 +49,65 @@
 ==========================================================
 */
 
+/*
+The inline keyword is supported by C99 but not by C90. 
+Most compilers implement their own version of this keyword ... 
+*/
+#ifndef INLINE
+	#if defined(_MSC_VER)
+		#define INLINE __forceinline
+	#elif defined(__GNUC__)
+		#define INLINE __inline__
+	#elif defined(__MWERKS__)
+		#define INLINE inline
+	#else 
+		/* add other compilers here ... */
+		#define INLINE 
+	#endif /* defined(<Compiler>) */
+#endif /* INLINE */
+
 /* deprecated attribute */
 #ifdef __GNUC__
-	#define DEPRECATED(func) func __attribute__ ((deprecated))
+	#define OPJ_DEPRECATED(func) func __attribute__ ((deprecated))
 #elif defined(_MSC_VER)
-	#define DEPRECATED(func) __declspec(deprecated) func
+	#define OPJ_DEPRECATED(func) __declspec(deprecated) func
 #else
 	#pragma message("WARNING: You need to implement DEPRECATED for this compiler")
-	#define DEPRECATED(func) func
+	#define OPJ_DEPRECATED(func) func
 #endif
 
 #if defined(OPJ_STATIC) || !defined(_WIN32)
 /* http://gcc.gnu.org/wiki/Visibility */
-#if __GNUC__ >= 4
-#define OPJ_API    __attribute__ ((visibility ("default")))
-#define OPJ_LOCAL  __attribute__ ((visibility ("hidden")))
+#	if __GNUC__ >= 4
+#		if defined(OPJ_STATIC) /* static library uses "hidden" */
+#			define OPJ_API    __attribute__ ((visibility ("hidden")))
+#		else
+#			define OPJ_API    __attribute__ ((visibility ("default")))
+#		endif
+#		define OPJ_LOCAL  __attribute__ ((visibility ("hidden")))
+#	else
+#		define OPJ_API
+#		define OPJ_LOCAL
+#	endif
+#	define OPJ_CALLCONV
 #else
-#define OPJ_API
-#define OPJ_LOCAL
-#endif
-#define OPJ_CALLCONV
-#else
-#define OPJ_CALLCONV __stdcall
+#	define OPJ_CALLCONV __stdcall
 /*
 The following ifdef block is the standard way of creating macros which make exporting 
 from a DLL simpler. All files within this DLL are compiled with the OPJ_EXPORTS
 symbol defined on the command line. this symbol should not be defined on any project
 that uses this DLL. This way any other project whose source files include this file see 
-OPJ_API functions as being imported from a DLL, wheras this DLL sees symbols
+OPJ_API functions as being imported from a DLL, whereas this DLL sees symbols
 defined with this macro as being exported.
 */
-#if defined(OPJ_EXPORTS) || defined(DLL_EXPORT)
-#define OPJ_API __declspec(dllexport)
-#else
-#define OPJ_API __declspec(dllimport)
-#endif /* OPJ_EXPORTS */
+#	if defined(OPJ_EXPORTS) || defined(DLL_EXPORT)
+#		define OPJ_API __declspec(dllexport)
+#	else
+#		define OPJ_API __declspec(dllimport)
+#	endif /* OPJ_EXPORTS */
 #endif /* !OPJ_STATIC || !_WIN32 */
 
-typedef int OPJ_BOOL; /*FIXME it should be to follow the name of others OPJ_TYPE -> OPJ_BOOL*/
+typedef int OPJ_BOOL;
 #define OPJ_TRUE 1
 #define OPJ_FALSE 0
 
@@ -99,6 +126,11 @@ typedef int32_t  OPJ_INT32;
 typedef uint32_t OPJ_UINT32;
 typedef int64_t  OPJ_INT64;
 typedef uint64_t OPJ_UINT64;
+
+typedef int64_t  OPJ_OFF_T; /* 64-bit file offset type */
+
+#include <stdio.h>
+typedef size_t   OPJ_SIZE_T;
 
 /* Avoid compile-time warning because parameter is not used */
 #define OPJ_ARG_NOT_USED(x) (void)(x)
@@ -138,37 +170,95 @@ typedef uint64_t OPJ_UINT64;
 #define OPJ_IMG_INFO		1	/**< Basic image information provided to the user */
 #define OPJ_J2K_MH_INFO		2	/**< Codestream information based only on the main header */
 #define OPJ_J2K_TH_INFO		4	/**< Tile information based on the current tile header */
-/*FIXME #define OPJ_J2K_CSTR_INFO	6*/	/**<  */
+#define OPJ_J2K_TCH_INFO	8	/**< Tile/Component information of all tiles */
 #define OPJ_J2K_MH_IND		16	/**< Codestream index based only on the main header */
 #define OPJ_J2K_TH_IND		32	/**< Tile index based on the current tile */
 /*FIXME #define OPJ_J2K_CSTR_IND	48*/	/**<  */
 #define OPJ_JP2_INFO		128	/**< JP2 file information */
 #define OPJ_JP2_IND			256	/**< JP2 file index */
 
+/**
+ * JPEG 2000 Profiles, see Table A.10 from 15444-1 (updated in various AMD)
+ * These values help chosing the RSIZ value for the J2K codestream.
+ * The RSIZ value triggers various encoding options, as detailed in Table A.10.
+ * If OPJ_PROFILE_PART2 is chosen, it has to be combined with one or more extensions
+ * described hereunder.
+ *   Example: rsiz = OPJ_PROFILE_PART2 | OPJ_EXTENSION_MCT;
+ * For broadcast profiles, the OPJ_PROFILE value has to be combined with the targeted
+ * mainlevel (3-0 LSB, value between 0 and 11):
+ *   Example: rsiz = OPJ_PROFILE_BC_MULTI | 0x0005; (here mainlevel 5)
+ * For IMF profiles, the OPJ_PROFILE value has to be combined with the targeted mainlevel
+ * (3-0 LSB, value between 0 and 11) and sublevel (7-4 LSB, value between 0 and 9):
+ *   Example: rsiz = OPJ_PROFILE_IMF_2K | 0x0040 | 0x0005; (here main 5 and sublevel 4)
+ * */
+#define OPJ_PROFILE_NONE        0x0000 /** no profile, conform to 15444-1 */
+#define OPJ_PROFILE_0           0x0001 /** Profile 0 as described in 15444-1,Table A.45 */
+#define OPJ_PROFILE_1           0x0002 /** Profile 1 as described in 15444-1,Table A.45 */
+#define OPJ_PROFILE_PART2       0x8000 /** At least 1 extension defined in 15444-2 (Part-2) */
+#define OPJ_PROFILE_CINEMA_2K   0x0003 /** 2K cinema profile defined in 15444-1 AMD1 */
+#define OPJ_PROFILE_CINEMA_4K   0x0004 /** 4K cinema profile defined in 15444-1 AMD1 */
+#define OPJ_PROFILE_CINEMA_S2K  0x0005 /** Scalable 2K cinema profile defined in 15444-1 AMD2 */
+#define OPJ_PROFILE_CINEMA_S4K  0x0006 /** Scalable 4K cinema profile defined in 15444-1 AMD2 */
+#define OPJ_PROFILE_CINEMA_LTS  0x0007 /** Long term storage cinema profile defined in 15444-1 AMD2 */
+#define OPJ_PROFILE_BC_SINGLE   0x0100 /** Single Tile Broadcast profile defined in 15444-1 AMD3 */
+#define OPJ_PROFILE_BC_MULTI    0x0200 /** Multi Tile Broadcast profile defined in 15444-1 AMD3 */
+#define OPJ_PROFILE_BC_MULTI_R  0x0300 /** Multi Tile Reversible Broadcast profile defined in 15444-1 AMD3 */
+#define OPJ_PROFILE_IMF_2K      0x0400 /** 2K Single Tile Lossy IMF profile defined in 15444-1 AMD 8 */
+#define OPJ_PROFILE_IMF_4K      0x0401 /** 4K Single Tile Lossy IMF profile defined in 15444-1 AMD 8 */
+#define OPJ_PROFILE_IMF_8K      0x0402 /** 8K Single Tile Lossy IMF profile defined in 15444-1 AMD 8 */
+#define OPJ_PROFILE_IMF_2K_R    0x0403 /** 2K Single/Multi Tile Reversible IMF profile defined in 15444-1 AMD 8 */
+#define OPJ_PROFILE_IMF_4K_R    0x0800 /** 4K Single/Multi Tile Reversible IMF profile defined in 15444-1 AMD 8 */
+#define OPJ_PROFILE_IMF_8K_R    0x0801  /** 8K Single/Multi Tile Reversible IMF profile defined in 15444-1 AMD 8 */
+
+/**
+ * JPEG 2000 Part-2 extensions
+ * */
+#define OPJ_EXTENSION_NONE      0x0000 /** No Part-2 extension */
+#define OPJ_EXTENSION_MCT       0x0100  /** Custom MCT support */
+
+/**
+ * JPEG 2000 profile macros
+ * */
+#define OPJ_IS_CINEMA(v)     (((v) >= OPJ_PROFILE_CINEMA_2K)&&((v) <= OPJ_PROFILE_CINEMA_S4K))
+#define OPJ_IS_STORAGE(v)    ((v) == OPJ_PROFILE_CINEMA_LTS)
+#define OPJ_IS_BROADCAST(v)  (((v) >= OPJ_PROFILE_BC_SINGLE)&&((v) <= ((OPJ_PROFILE_BC_MULTI_R) | (0x000b))))
+#define OPJ_IS_IMF(v)        (((v) >= OPJ_PROFILE_IMF_2K)&&((v) <= ((OPJ_PROFILE_IMF_8K_R) | (0x009b))))
+#define OPJ_IS_PART2(v)      ((v) & OPJ_PROFILE_PART2)
+
+/**
+ * JPEG 2000 codestream and component size limits in cinema profiles
+ * */
+#define OPJ_CINEMA_24_CS     1302083   	/** Maximum codestream length for 24fps */
+#define OPJ_CINEMA_48_CS     651041     /** Maximum codestream length for 48fps */
+#define OPJ_CINEMA_24_COMP   1041666    /** Maximum size per color component for 2K & 4K @ 24fps */
+#define OPJ_CINEMA_48_COMP   520833		/** Maximum size per color component for 2K @ 48fps */
 
 /* 
 ==========================================================
    enum definitions
 ==========================================================
 */
-/** 
+
+/**
+ * DEPRECATED: use RSIZ, OPJ_PROFILE_* and OPJ_EXTENSION_* instead
  * Rsiz Capabilities
  * */
 typedef enum RSIZ_CAPABILITIES {
-	OPJ_STD_RSIZ = 0,		/** Standard JPEG2000 profile*/
-	OPJ_CINEMA2K = 3,		/** Profile name for a 2K image*/
-	OPJ_CINEMA4K = 4,		/** Profile name for a 4K image*/
-	OPJ_MCT = 0x8100
+    OPJ_STD_RSIZ = 0,		/** Standard JPEG2000 profile*/
+    OPJ_CINEMA2K = 3,		/** Profile name for a 2K image*/
+    OPJ_CINEMA4K = 4,		/** Profile name for a 4K image*/
+    OPJ_MCT = 0x8100
 } OPJ_RSIZ_CAPABILITIES;
 
-/** 
+/**
+ * DEPRECATED: use RSIZ, OPJ_PROFILE_* and OPJ_EXTENSION_* instead
  * Digital cinema operation mode
  * */
 typedef enum CINEMA_MODE {
-	OPJ_OFF = 0,			/** Not Digital Cinema*/
-	OPJ_CINEMA2K_24 = 1,	/** 2K Digital Cinema at 24 fps*/
-	OPJ_CINEMA2K_48 = 2,	/** 2K Digital Cinema at 48 fps*/
-	OPJ_CINEMA4K_24 = 3		/** 4K Digital Cinema at 24 fps*/
+    OPJ_OFF = 0,			/** Not Digital Cinema*/
+    OPJ_CINEMA2K_24 = 1,	/** 2K Digital Cinema at 24 fps*/
+    OPJ_CINEMA2K_48 = 2,	/** 2K Digital Cinema at 48 fps*/
+    OPJ_CINEMA4K_24 = 3		/** 4K Digital Cinema at 24 fps*/
 }OPJ_CINEMA_MODE;
 
 /** 
@@ -187,11 +277,13 @@ typedef enum PROG_ORDER {
  * Supported image color spaces
 */
 typedef enum COLOR_SPACE {
-	OPJ_CLRSPC_UNKNOWN = -1,	/**< not supported by the library */
-	OPJ_CLRSPC_UNSPECIFIED = 0, /**< not specified in the codestream */ 
-	OPJ_CLRSPC_SRGB = 1,		/**< sRGB */
-	OPJ_CLRSPC_GRAY = 2,		/**< grayscale */
-	OPJ_CLRSPC_SYCC = 3			/**< YUV */
+    OPJ_CLRSPC_UNKNOWN = -1,	/**< not supported by the library */
+    OPJ_CLRSPC_UNSPECIFIED = 0,	/**< not specified in the codestream */
+    OPJ_CLRSPC_SRGB = 1,		/**< sRGB */
+    OPJ_CLRSPC_GRAY = 2,		/**< grayscale */
+    OPJ_CLRSPC_SYCC = 3,		/**< YUV */
+    OPJ_CLRSPC_EYCC = 4,        /**< e-YCC */
+    OPJ_CLRSPC_CMYK = 5         /**< CMYK */
 } OPJ_COLOR_SPACE;
 
 /**
@@ -201,7 +293,9 @@ typedef enum CODEC_FORMAT {
 	OPJ_CODEC_UNKNOWN = -1,	/**< place-holder */
 	OPJ_CODEC_J2K  = 0,		/**< JPEG-2000 codestream : read/write */
 	OPJ_CODEC_JPT  = 1,		/**< JPT-stream (JPEG 2000, JPIP) : read only */
-	OPJ_CODEC_JP2  = 2 		/**< JPEG-2000 file format : read/write */
+    OPJ_CODEC_JP2  = 2,		/**< JP2 file format : read/write */
+    OPJ_CODEC_JPP  = 3,		/**< JPP-stream (JPEG 2000, JPIP) : to be coded */
+    OPJ_CODEC_JPX  = 4		/**< JPX file format (JPEG 2000 Part-2) : to be coded */
 } OPJ_CODEC_FORMAT;
 
 
@@ -287,7 +381,7 @@ typedef struct opj_cparameters {
 	OPJ_UINT32 numpocs;
 	/** number of layers */
 	int tcp_numlayers;
-	/** rates of layers */
+    /** rates of layers - might be subsequently limited by the max_cs_size field */
 	float tcp_rates[100];
 	/** different psnr for successive layers */
 	float tcp_distoratio[100];
@@ -368,12 +462,21 @@ typedef struct opj_cparameters {
 	/*@}*/
 /* <<UniPG */
 
-	/** Digital Cinema compliance 0-not compliant, 1-compliant*/
-	OPJ_CINEMA_MODE cp_cinema;
-	/** Maximum rate for each component. If == 0, component size limitation is not considered */
+    /**
+     * DEPRECATED: use RSIZ, OPJ_PROFILE_* and MAX_COMP_SIZE instead
+     * Digital Cinema compliance 0-not compliant, 1-compliant
+     * */
+    OPJ_CINEMA_MODE cp_cinema;
+    /**
+     * Maximum size (in bytes) for each component.
+     * If == 0, component size limitation is not considered
+     * */
 	int max_comp_size;
-	/** Profile name*/
-	OPJ_RSIZ_CAPABILITIES cp_rsiz;
+    /**
+     * DEPRECATED: use RSIZ, OPJ_PROFILE_* and OPJ_EXTENSION_* instead
+     * Profile name
+     * */
+    OPJ_RSIZ_CAPABILITIES cp_rsiz;
 	/** Tile part generation*/
 	char tp_on;
 	/** Flag for Tile part generation*/
@@ -382,8 +485,19 @@ typedef struct opj_cparameters {
 	char tcp_mct;
 	/** Enable JPIP indexing*/
 	OPJ_BOOL jpip_on;
-	/** Naive implementation of MCT restricted to a single reversible array based encoding without offset concerning all the components. */
+	/** Naive implementation of MCT restricted to a single reversible array based 
+        encoding without offset concerning all the components. */
 	void * mct_data;
+    /**
+     * Maximum size (in bytes) for the whole codestream.
+     * If == 0, codestream size limitation is not considered
+     * If it does not comply with tcp_rates, max_cs_size prevails
+     * and a warning is issued.
+     * */
+    int max_cs_size;
+    /** RSIZ value
+        To be used to combine OPJ_PROFILE_*, OPJ_EXTENSION_* and (sub)levels values. */
+    OPJ_UINT16 rsiz;
 } opj_cparameters_t;  
 
 #define OPJ_DPARAMETERS_IGNORE_PCLR_CMAP_CDEF_FLAG	0x0001
@@ -494,6 +608,11 @@ typedef OPJ_OFF_T (* opj_stream_skip_fn) (OPJ_OFF_T p_nb_bytes, void * p_user_da
 typedef OPJ_BOOL (* opj_stream_seek_fn) (OPJ_OFF_T p_nb_bytes, void * p_user_data) ;
 
 /*
+ * Callback function prototype for free user data function
+ */
+typedef void (* opj_stream_free_user_data_fn) (void * p_user_data) ;
+
+/*
  * JPEG2000 Stream.
  */
 typedef void * opj_stream_t;
@@ -532,6 +651,8 @@ typedef struct opj_image_comp {
 	OPJ_UINT32 factor;
 	/** image component data */
 	OPJ_INT32 *data;
+  /** alpha channel */
+  OPJ_UINT16 alpha;
 } opj_image_comp_t;
 
 /** 
@@ -729,7 +850,7 @@ typedef struct opj_codestream_info {
 } opj_codestream_info_t;
 
 /* <----------------------------------------------------------- */
-/* new output managment of the codestream information and index */
+/* new output management of the codestream information and index */
 
 /**
  * Tile-component coding parameters information
@@ -999,7 +1120,7 @@ OPJ_API opj_stream_t* OPJ_CALLCONV opj_stream_create(OPJ_SIZE_T p_buffer_size, O
  * @param	p_stream	the stream to destroy.
  */
 OPJ_API void OPJ_CALLCONV opj_stream_destroy(opj_stream_t* p_stream);
-
+ 
 /**
  * Sets the given function to be used as a read function.
  * @param		p_stream	the stream to modify
@@ -1032,8 +1153,9 @@ OPJ_API void OPJ_CALLCONV opj_stream_set_seek_function(opj_stream_t* p_stream, o
  * Sets the given data to be used as a user data for the stream.
  * @param		p_stream	the stream to modify
  * @param		p_data		the data to set.
+ * @param		p_function	the function to free p_data when opj_stream_destroy() is called.
 */
-OPJ_API void OPJ_CALLCONV opj_stream_set_user_data (opj_stream_t* p_stream, void * p_data);
+OPJ_API void OPJ_CALLCONV opj_stream_set_user_data (opj_stream_t* p_stream, void * p_data, opj_stream_free_user_data_fn p_function);
 
 /**
  * Sets the length of the user data for the stream.
@@ -1044,21 +1166,21 @@ OPJ_API void OPJ_CALLCONV opj_stream_set_user_data (opj_stream_t* p_stream, void
 OPJ_API void OPJ_CALLCONV opj_stream_set_user_data_length(opj_stream_t* p_stream, OPJ_UINT64 data_length);
 
 /**
- * Helper function.
- * Sets the stream to be a file stream. The FILE must have been open previously.
- * @param p_file            the file stream to operate on
+ * Create a stream from a file identified with its filename with default parameters (helper function)
+ * @param fname             the filename of the file to stream
  * @param p_is_read_stream  whether the stream is a read stream (true) or not (false)
 */
-OPJ_API opj_stream_t* OPJ_CALLCONV opj_stream_create_default_file_stream (FILE * p_file, OPJ_BOOL p_is_read_stream);
-
-/**
- * FIXME DOC
- * @param p_file            the file stream to operate on
+OPJ_API opj_stream_t* OPJ_CALLCONV opj_stream_create_default_file_stream (const char *fname, OPJ_BOOL p_is_read_stream);
+ 
+/** Create a stream from a file identified with its filename with a specific buffer size
+ * @param fname             the filename of the file to stream
  * @param p_buffer_size     size of the chunk used to stream
  * @param p_is_read_stream  whether the stream is a read stream (true) or not (false)
 */
-OPJ_API opj_stream_t* OPJ_CALLCONV opj_stream_create_file_stream (FILE * p_file, OPJ_SIZE_T p_buffer_size, OPJ_BOOL p_is_read_stream);
-
+OPJ_API opj_stream_t* OPJ_CALLCONV opj_stream_create_file_stream (const char *fname,
+                                                                     OPJ_SIZE_T p_buffer_size,
+                                                                     OPJ_BOOL p_is_read_stream);
+ 
 /* 
 ==========================================================
    event manager functions definitions
@@ -1212,7 +1334,8 @@ OPJ_API OPJ_BOOL OPJ_CALLCONV opj_set_decoded_resolution_factor(opj_codec_t *p_c
  * @param	p_codec		        the jpeg2000 codec.
  * @param	p_tile_index		the index of the tile to write. At the moment, the tiles must be written from 0 to n-1 in sequence.
  * @param	p_data				pointer to the data to write. Data is arranged in sequence, data_comp0, then data_comp1, then ... NO INTERLEAVING should be set.
- * @param	p_data_size			this value os used to make sure the data being written is correct. The size must be equal to the sum for each component of tile_width * tile_height * component_size. component_size can be 1,2 or 4 bytes, depending on the precision of the given component.
+ * @param	p_data_size			this value os used to make sure the data being written is correct. The size must be equal to the sum for each component of 
+ *                              tile_width * tile_height * component_size. component_size can be 1,2 or 4 bytes, depending on the precision of the given component.
  * @param	p_stream			the stream to write data to.
  *
  * @return	true if the data could be written.
@@ -1224,7 +1347,7 @@ OPJ_API OPJ_BOOL OPJ_CALLCONV opj_write_tile (	opj_codec_t *p_codec,
 												opj_stream_t *p_stream );
 
 /**
- * Reads a tile header. This function is compulsory and allows one to know the size of the tile thta will be decoded.
+ * Reads a tile header. This function is compulsory and allows one to know the size of the tile that will be decoded.
  * The user may need to refer to the image got by opj_read_header to understand the size being taken by the tile.
  *
  * @param	p_codec			the jpeg2000 codec.

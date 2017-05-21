@@ -1,11 +1,17 @@
 /*
- * Copyright (c) 2002-2007, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2007, Professor Benoit Macq
+ * The copyright in this software is being made available under the 2-clauses 
+ * BSD License, included below. This software may be subject to other third 
+ * party and contributor rights, including patent rights, and no such rights
+ * are granted under this license.
+ *
+ * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2014, Professor Benoit Macq
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2003-2007, Francois-Olivier Devaux and Antonin Descampe
+ * Copyright (c) 2003-2007, Francois-Olivier Devaux 
+ * Copyright (c) 2003-2014, Antonin Descampe
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
- * Copyright (c) 2008;2011-2012, Centre National d'Etudes Spatiales (CNES), France 
+ * Copyright (c) 2008, 2011-2012, Centre National d'Etudes Spatiales (CNES), FR 
  * Copyright (c) 2012, CS Systemes d'Information, France
  * All rights reserved.
  *
@@ -39,7 +45,7 @@
 ==========================================================
 */
 
-opj_tgt_tree_t *opj_tgt_create(OPJ_UINT32 numleafsh, OPJ_UINT32 numleafsv) {
+opj_tgt_tree_t *opj_tgt_create(OPJ_UINT32 numleafsh, OPJ_UINT32 numleafsv, opj_event_mgr_t *manager) {
         OPJ_INT32 nplh[32];
         OPJ_INT32 nplv[32];
         opj_tgt_node_t *node = 00;
@@ -51,22 +57,21 @@ opj_tgt_tree_t *opj_tgt_create(OPJ_UINT32 numleafsh, OPJ_UINT32 numleafsv) {
         OPJ_UINT32 numlvls;
         OPJ_UINT32 n;
 
-        tree = (opj_tgt_tree_t *) opj_malloc(sizeof(opj_tgt_tree_t));
+        tree = (opj_tgt_tree_t *) opj_calloc(1,sizeof(opj_tgt_tree_t));
         if(!tree) {
-                fprintf(stderr, "ERROR in tgt_create_v2 while allocating tree\n");
+                opj_event_msg(manager, EVT_ERROR, "Not enough memory to create Tag-tree\n");
                 return 00;
         }
-        memset(tree,0,sizeof(opj_tgt_tree_t));
 
         tree->numleafsh = numleafsh;
         tree->numleafsv = numleafsv;
 
         numlvls = 0;
-        nplh[0] = numleafsh;
-        nplv[0] = numleafsv;
+        nplh[0] = (OPJ_INT32)numleafsh;
+        nplv[0] = (OPJ_INT32)numleafsv;
         tree->numnodes = 0;
         do {
-                n = nplh[numlvls] * nplv[numlvls];
+                n = (OPJ_UINT32)(nplh[numlvls] * nplv[numlvls]);
                 nplh[numlvls + 1] = (nplh[numlvls] + 1) / 2;
                 nplv[numlvls + 1] = (nplv[numlvls] + 1) / 2;
                 tree->numnodes += n;
@@ -76,18 +81,17 @@ opj_tgt_tree_t *opj_tgt_create(OPJ_UINT32 numleafsh, OPJ_UINT32 numleafsv) {
         /* ADD */
         if (tree->numnodes == 0) {
                 opj_free(tree);
-                fprintf(stderr, "WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.\n");
+                opj_event_msg(manager, EVT_WARNING, "tgt_create tree->numnodes == 0, no tree created.\n");
                 return 00;
         }
 
         tree->nodes = (opj_tgt_node_t*) opj_calloc(tree->numnodes, sizeof(opj_tgt_node_t));
         if(!tree->nodes) {
-                fprintf(stderr, "ERROR in tgt_create_v2 while allocating node of the tree\n");
+                opj_event_msg(manager, EVT_ERROR, "Not enough memory to create Tag-tree nodes\n");
                 opj_free(tree);
                 return 00;
         }
-        memset(tree->nodes,0,tree->numnodes * sizeof(opj_tgt_node_t));
-        tree->nodes_size = tree->numnodes * sizeof(opj_tgt_node_t);
+        tree->nodes_size = tree->numnodes * (OPJ_UINT32)sizeof(opj_tgt_node_t);
 
         node = tree->nodes;
         l_parent_node = &tree->nodes[tree->numleafsh * tree->numleafsv];
@@ -119,14 +123,14 @@ opj_tgt_tree_t *opj_tgt_create(OPJ_UINT32 numleafsh, OPJ_UINT32 numleafsv) {
 }
 
 /**
- * Reinitialises a tag-tree from an exixting one. (V2 framevork)
+ * Reinitialises a tag-tree from an existing one.
  *
  * @param       p_tree                          the tree to reinitialize.
  * @param       p_num_leafs_h           the width of the array of leafs of the tree
  * @param       p_num_leafs_v           the height of the array of leafs of the tree
  * @return      a new tag-tree if successful, NULL otherwise
 */
-opj_tgt_tree_t *opj_tgt_init(opj_tgt_tree_t * p_tree,OPJ_UINT32 p_num_leafs_h, OPJ_UINT32 p_num_leafs_v)
+opj_tgt_tree_t *opj_tgt_init(opj_tgt_tree_t * p_tree,OPJ_UINT32 p_num_leafs_h, OPJ_UINT32 p_num_leafs_v, opj_event_mgr_t *p_manager)
 {
         OPJ_INT32 l_nplh[32];
         OPJ_INT32 l_nplv[32];
@@ -148,12 +152,12 @@ opj_tgt_tree_t *opj_tgt_init(opj_tgt_tree_t * p_tree,OPJ_UINT32 p_num_leafs_h, O
                 p_tree->numleafsv = p_num_leafs_v;
 
                 l_num_levels = 0;
-                l_nplh[0] = p_num_leafs_h;
-                l_nplv[0] = p_num_leafs_v;
+                l_nplh[0] = (OPJ_INT32)p_num_leafs_h;
+                l_nplv[0] = (OPJ_INT32)p_num_leafs_v;
                 p_tree->numnodes = 0;
                 do
                 {
-                        n = l_nplh[l_num_levels] * l_nplv[l_num_levels];
+                        n = (OPJ_UINT32)(l_nplh[l_num_levels] * l_nplv[l_num_levels]);
                         l_nplh[l_num_levels + 1] = (l_nplh[l_num_levels] + 1) / 2;
                         l_nplv[l_num_levels + 1] = (l_nplv[l_num_levels] + 1) / 2;
                         p_tree->numnodes += n;
@@ -166,12 +170,12 @@ opj_tgt_tree_t *opj_tgt_init(opj_tgt_tree_t * p_tree,OPJ_UINT32 p_num_leafs_h, O
                         opj_tgt_destroy(p_tree);
                         return 00;
                 }
-                l_node_size = p_tree->numnodes * sizeof(opj_tgt_node_t);
+                l_node_size = p_tree->numnodes * (OPJ_UINT32)sizeof(opj_tgt_node_t);
                 
                 if (l_node_size > p_tree->nodes_size) {
                         opj_tgt_node_t* new_nodes = (opj_tgt_node_t*) opj_realloc(p_tree->nodes, l_node_size);
                         if (! new_nodes) {
-                                fprintf(stderr, "ERROR Not enough memory to reinitialize the tag tree\n");
+                                opj_event_msg(p_manager, EVT_ERROR, "Not enough memory to reinitialize the tag tree\n");
                                 opj_tgt_destroy(p_tree);
                                 return 00;
                         }

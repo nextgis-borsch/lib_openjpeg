@@ -1,9 +1,15 @@
 /*
- * Copyright (c) 2002-2007, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2007, Professor Benoit Macq
+ * The copyright in this software is being made available under the 2-clauses 
+ * BSD License, included below. This software may be subject to other third 
+ * party and contributor rights, including patent rights, and no such rights
+ * are granted under this license.
+ *
+ * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
+ * Copyright (c) 2002-2014, Professor Benoit Macq
  * Copyright (c) 2001-2003, David Janssens
  * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2003-2007, Francois-Olivier Devaux and Antonin Descampe
+ * Copyright (c) 2003-2007, Francois-Olivier Devaux 
+ * Copyright (c) 2003-2014, Antonin Descampe
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
  * Copyright (c) 2006-2007, Parvatha Elangovan
  * Copyright (c) 2008, Jerome Fimes, Communications & Systemes <jerome.fimes@c-s.fr>
@@ -58,6 +64,8 @@ The functions in J2K.C have for goal to read/write the several parts of the code
 #define J2K_CCP_QNTSTY_NOQNT 0
 #define J2K_CCP_QNTSTY_SIQNT 1
 #define J2K_CCP_QNTSTY_SEQNT 2
+
+#define OPJ_J2K_DEFAULT_CBLK_DATA_SIZE 8192
 
 /* ----------------------------------------------------------------------- */
 
@@ -224,6 +232,12 @@ typedef struct opj_simple_mcc_decorrelation_data
 }
 opj_simple_mcc_decorrelation_data_t;
 
+typedef struct opj_ppx_struct
+{
+	OPJ_BYTE*   m_data; /* m_data == NULL => Zppx not read yet */
+	OPJ_UINT32	m_data_size;
+} opj_ppx;
+
 /**
 Tile coding parameters :
 this structure is used to store coding/decoding parameters common to all
@@ -246,7 +260,13 @@ typedef struct opj_tcp
 	OPJ_UINT32 numpocs;
 	/** progression order changes */
 	opj_poc_t pocs[32];
-	/** packet header store there for futur use in t2_decode_packet */
+	
+	/** number of ppt markers (reserved size) */
+	OPJ_UINT32 ppt_markers_count;
+	/** ppt markers data (table indexed by Zppt) */
+	opj_ppx* ppt_markers;
+	
+	/** packet header store there for future use in t2_decode_packet */
 	OPJ_BYTE *ppt_data;
 	/** used to keep a track of the allocated memory */
 	OPJ_BYTE *ppt_buffer;
@@ -285,6 +305,8 @@ typedef struct opj_tcp
 
 
 	/***** FLAGS *******/
+	/** If cod == 1 --> there was a COD marker for the present tile */
+	OPJ_UINT32 cod : 1;
 	/** If ppt == 1 --> there was a PPT marker for the present tile */
 	OPJ_UINT32 ppt : 1;
 	/** indicates if a POC marker has been used O:NO, 1:YES */
@@ -296,8 +318,6 @@ typedef struct opj_tcp
 
 typedef struct opj_encoding_param
 {
-	/** Digital cinema profile*/
-	OPJ_CINEMA_MODE m_cinema;
 	/** Maximum rate for each component. If == 0, component size limitation is not considered */
 	OPJ_UINT32 m_max_comp_size;
 	/** Position of tile part flag in progression order*/
@@ -335,7 +355,7 @@ typedef struct opj_cp
 	/** Size of the image in bits*/
 	/*int img_size;*/
 	/** Rsiz*/
-	OPJ_RSIZ_CAPABILITIES rsiz;
+    OPJ_UINT16 rsiz;
 	/** XTOsiz */
 	OPJ_UINT32 tx0; /* MSD see norm */
 	/** YTOsiz */
@@ -351,7 +371,12 @@ typedef struct opj_cp
 	/** number of tiles in heigth */
 	OPJ_UINT32 th;
 
-	/** packet header store there for futur use in t2_decode_packet */
+	/** number of ppm markers (reserved size) */
+	OPJ_UINT32 ppm_markers_count;
+	/** ppm markers data (table indexed by Zppm) */
+	opj_ppx* ppm_markers;
+	
+	/** packet header store there for future use in t2_decode_packet */
 	OPJ_BYTE *ppm_data;
 	/** size of the ppm_data*/
 	OPJ_UINT32 ppm_len;
@@ -475,6 +500,9 @@ typedef struct opj_j2k_dec
 	OPJ_UINT32 m_can_decode			: 1;
 	OPJ_UINT32 m_discard_tiles		: 1;
 	OPJ_UINT32 m_skip_data			: 1;
+	/** TNsot correction : see issue 254 **/
+	OPJ_UINT32 m_nb_tile_parts_correction_checked : 1;
+	OPJ_UINT32 m_nb_tile_parts_correction : 1;
 
 } opj_j2k_dec_t;
 
@@ -561,7 +589,6 @@ typedef struct opj_j2k
 
 	/** the current tile coder/decoder **/
 	struct opj_tcd *	m_tcd;
-
 }
 opj_j2k_t;
 
@@ -588,7 +615,7 @@ void opj_j2k_setup_decoder(opj_j2k_t *j2k, opj_dparameters_t *parameters);
 opj_j2k_t* opj_j2k_create_compress(void);
 
 
-void opj_j2k_setup_encoder(	opj_j2k_t *p_j2k,
+OPJ_BOOL opj_j2k_setup_encoder(	opj_j2k_t *p_j2k,
 						    opj_cparameters_t *parameters,
 						    opj_image_t *image,
 						    opj_event_mgr_t * p_manager);

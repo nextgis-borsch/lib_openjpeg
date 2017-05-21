@@ -1,6 +1,11 @@
 /*
+ * The copyright in this software is being made available under the 2-clauses 
+ * BSD License, included below. This software may be subject to other third 
+ * party and contributor rights, including patent rights, and no such rights
+ * are granted under this license.
+ *
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
- * Copyright (c) 2008;2011-2012, Centre National d'Etudes Spatiales (CNES), France 
+ * Copyright (c) 2008, 2011-2012, Centre National d'Etudes Spatiales (CNES), FR 
  * Copyright (c) 2012, CS Systemes d'Information, France
  * All rights reserved.
  *
@@ -32,7 +37,7 @@
  * This must be included before any system headers,
  * since they can react to macro defined there
  */
-#include "opj_config.h"
+#include "opj_config_private.h"
 
 /*
  ==========================================================
@@ -56,7 +61,7 @@
   ftello() only on systems with special LFS support since some systems
   (e.g. FreeBSD) support a 64-bit off_t by default.
 */
-#if defined(HAVE_FSEEKO)
+#if defined(OPJ_HAVE_FSEEKO) && !defined(fseek)
 #  define fseek  fseeko
 #  define ftell  ftello
 #endif
@@ -97,61 +102,92 @@
  ==========================================================
 */
 
-/* Ignore GCC attributes if this is not GCC */
-#ifndef __GNUC__
-	#define __attribute__(x) /* __attribute__(x) */
-#endif
+/* Are restricted pointers available? (C99) */
+#if (__STDC_VERSION__ >= 199901L)
+  #define OPJ_RESTRICT restrict
+#else
+	/* Not a C99 compiler */
+	#if defined(__GNUC__)
+		#define OPJ_RESTRICT __restrict__
 
 /*
-The inline keyword is supported by C99 but not by C90. 
-Most compilers implement their own version of this keyword ... 
+  vc14 (2015) outputs wrong results.
+  Need to check OPJ_RESTRICT usage (or a bug in vc14)
+	#elif defined(_MSC_VER) && (_MSC_VER >= 1400)
+		#define OPJ_RESTRICT __restrict
 */
-#ifndef INLINE
-	#if defined(_MSC_VER)
-		#define INLINE __forceinline
-	#elif defined(__GNUC__)
-		#define INLINE __inline__
-	#elif defined(__MWERKS__)
-		#define INLINE inline
-	#else 
-		/* add other compilers here ... */
-		#define INLINE 
-	#endif /* defined(<Compiler>) */
-#endif /* INLINE */
-
-/* Are restricted pointers available? (C99) */
-#if (__STDC_VERSION__ != 199901L)
-	/* Not a C99 compiler */
-	#ifdef __GNUC__
-		#define restrict __restrict__
 	#else
-		#define restrict /* restrict */
+		#define OPJ_RESTRICT /* restrict */
 	#endif
 #endif
 
-/* MSVC and Borland C do not have lrintf */
-#if defined(_MSC_VER) || defined(__BORLANDC__)
-static INLINE long lrintf(float f){
+#ifdef __has_attribute
+	#if __has_attribute(no_sanitize)
+		#define OPJ_NOSANITIZE(kind) __attribute__((no_sanitize(kind)))
+	#endif
+#endif
+#ifndef OPJ_NOSANITIZE
+	#define OPJ_NOSANITIZE(kind)
+#endif
+
+
+/* MSVC before 2013 and Borland C do not have lrintf */
+#if defined(_MSC_VER)
+#include <intrin.h>
+static INLINE long opj_lrintf(float f){
 #ifdef _M_X64
-    return (long)((f>0.0f) ? (f + 0.5f):(f -0.5f));
-#else
+	return _mm_cvt_ss2si(_mm_load_ss(&f));
+
+	/* commented out line breaks many tests */
+  /* return (long)((f>0.0f) ? (f + 0.5f):(f -0.5f)); */
+#elif defined(_M_IX86)
     int i;
- 
-    _asm{
+     _asm{
         fld f
         fistp i
     };
  
     return i;
+#else 
+	return (long)((f>0.0f) ? (f + 0.5f) : (f - 0.5f));
 #endif
 }
+#elif defined(__BORLANDC__)
+static INLINE long opj_lrintf(float f) {
+#ifdef _M_X64
+     return (long)((f>0.0f) ? (f + 0.5f):(f -0.5f));
+#else
+	int i;
+
+	_asm {
+		fld f
+			fistp i
+	};
+
+	return i;
+#endif
+}
+#else
+static INLINE long opj_lrintf(float f) {
+	return lrintf(f);
+}
+#endif
+
+#if defined(_MSC_VER) && (_MSC_VER < 1400)
+	#define vsnprintf _vsnprintf
+#endif
+
+/* MSVC x86 is really bad at doing int64 = int32 * int32 on its own. Use intrinsic. */
+#if defined(_MSC_VER) && (_MSC_VER >= 1400) && !defined(__INTEL_COMPILER) && defined(_M_IX86)
+#	include <intrin.h>
+#	pragma intrinsic(__emul)
 #endif
 
 #include "opj_inttypes.h"
 #include "opj_clock.h"
 #include "opj_malloc.h"
-#include "function_list.h"
 #include "event.h"
+#include "function_list.h"
 #include "bio.h"
 #include "cio.h"
 
@@ -185,6 +221,7 @@ static INLINE long lrintf(float f){
 /* <<JPWL */
 
 /* V2 */
+#include "opj_codec.h"
 
 
 #endif /* OPJ_INCLUDES_H */

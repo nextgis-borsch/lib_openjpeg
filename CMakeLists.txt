@@ -30,7 +30,7 @@ if(OSX_FRAMEWORK)
   set(INSTALL_LIB_DIR "${CMAKE_INSTALL_PREFIX}/Library/Frameworks" CACHE INTERNAL "Installation directory for libraries" FORCE)
   set(SKIP_INSTALL_EXECUTABLES OFF)
   set(SKIP_INSTALL_EXPORT ON)
-  set(SKIP_INSTALL_FILES ON)
+  set(SKIP_INSTALL_FILES OFF)
   set(SKIP_INSTALL_DOCS OFF)
   set(CMAKE_MACOSX_RPATH ON)
 else()
@@ -46,12 +46,14 @@ set(VERSION ${OPENJPEG_VERSION_MAJOR}.${OPENJPEG_VERSION_MINOR}.${OPENJPEG_VERSI
 set(OPENJPEG_INSTALL_SUBDIR "openjpeg-${OPENJPEG_VERSION_MAJOR}.${OPENJPEG_VERSION_MINOR}")
 
 if(OSX_FRAMEWORK)
-    set(FRAMEWORK_VERSION "${OCAD_MAJOR_VERSION}")
+    set(FRAMEWORK_VERSION "${OPENJPEG_VERSION_MAJOR}")
     set(INSTALL_INC_DIR "${INSTALL_LIB_DIR}/${PROJECT_NAME}.framework/Versions/${FRAMEWORK_VERSION}/Headers/${OPENJPEG_INSTALL_SUBDIR}" CACHE INTERNAL "Installation directory for headers" FORCE)
     set(INSTALL_DOC_DIR "${INSTALL_LIB_DIR}/${PROJECT_NAME}.framework/Versions/${FRAMEWORK_VERSION}/Resources/docs")
+    set(INSTALL_INC_DIR_PACKAGE "${INSTALL_LIB_DIR}/${PROJECT_NAME}.framework/Versions/${FRAMEWORK_VERSION}/Headers" CACHE INTERNAL "Installation directory for headers in package" FORCE)
 else()
     set(INSTALL_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR}/${OPENJPEG_INSTALL_SUBDIR} CACHE INTERNAL "Installation directory for headers" FORCE)
     set(INSTALL_SHARE_DIR ${CMAKE_INSTALL_DATADIR}/${OPENJPEG_INSTALL_SUBDIR} CACHE INTERNAL "Installation directory for share data" FORCE)
+    set(INSTALL_INC_DIR_PACKAGE ${CMAKE_INSTALL_INCLUDEDIR} CACHE INTERNAL "Installation directory for headers in package" FORCE)
 endif()
 
 report_version(${PROJECT_NAME} ${VERSION})
@@ -96,11 +98,15 @@ set(PACKAGE_VERSION
 #   1.5   |  5
 #   1.5.1 |  5
 #   2.0   |  6
+#   2.0.1 |  6
+#   2.1   |  7
+#   2.1.1 |  7
+#   2.1.2 |  7
 # above is the recommendation by the OPJ team. If you really need to override this default,
 # you can specify your own OPENJPEG_SOVERSION at cmake configuration time:
 # cmake -DOPENJPEG_SOVERSION:STRING=42 /path/to/openjpeg
 if(NOT OPENJPEG_SOVERSION)
-  SET(OPENJPEG_SOVERSION 6)
+  set(OPENJPEG_SOVERSION 7)
 endif(NOT OPENJPEG_SOVERSION)
 
 set(SOVERSION ${OPENJPEG_SOVERSION})
