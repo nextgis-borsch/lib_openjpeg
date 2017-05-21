@@ -19,12 +19,25 @@
 # DEALINGS IN THE SOFTWARE.
 ################################################################################
 
-# Store version string in file for installer needs
-function(write_version major minor rev)
-    set(VERSION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt)
+function(check_version major minor rev)
+
+    # parse the version number from gdal_version.h and include in
+    # major, minor and rev parameters
+    set(VERSION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/cmake/util.cmake)
+
+    set(MAJOR_VERSION 2)
+    set(MINOR_VERSION 0)
+    set(REV_VERSION 0)
+
+    set(${major} ${MAJOR_VERSION} PARENT_SCOPE)
+    set(${minor} ${MINOR_VERSION} PARENT_SCOPE)
+    set(${rev} ${REV_VERSION} PARENT_SCOPE)
+
+    # Store version string in file for installer needs
     file(TIMESTAMP ${VERSION_FILE} VERSION_DATETIME "%Y-%m-%d %H:%M:%S" UTC)
-    file(WRITE ${CMAKE_BINARY_DIR}/version.str "${major}.${minor}.${rev}\n${VERSION_DATETIME}")
-endfunction(write_version)
+    file(WRITE ${CMAKE_BINARY_DIR}/version.str "${MAJOR_VERSION}.${MINOR_VERSION}.${REV_VERSION}\n${VERSION_DATETIME}")
+
+endfunction(check_version)
 
 function(report_version name ver)
     string(ASCII 27 Esc)

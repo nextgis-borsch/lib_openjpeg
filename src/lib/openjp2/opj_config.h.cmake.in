@@ -39,3 +39,6 @@ On other platforms we use the result of the TRY_RUN. */
 # define OPJ_BIG_ENDIAN
 #endif
 
+#define OPJ_VERSION_MAJOR @OPENJPEG_VERSION_MAJOR@
+#define OPJ_VERSION_MINOR @OPENJPEG_VERSION_MINOR@
+#define OPJ_VERSION_BUILD @OPENJPEG_VERSION_BUILD@

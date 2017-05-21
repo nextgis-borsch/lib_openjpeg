@@ -2,33 +2,37 @@
 
 include_regular_expression("^.*$")
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/opj_config.h DESTINATION ${INSTALL_INC_DIR} COMPONENT headers)
+configure_file(opj_config.h.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/opj_config.h @ONLY)
 
-include_directories(
-  ${OPENJPEG_BINARY_DIR}/src/lib/openjp2 # opj_config.h
-)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
 # Defines the source code for the library
-set(OPENJPEG_SRCS
-  ${CMAKE_CURRENT_SOURCE_DIR}/bio.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/cio.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/dwt.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/event.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/image.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/invert.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/j2k.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/jp2.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/mct.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/mqc.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/openjpeg.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/opj_clock.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/pi.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/raw.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/t1.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/t2.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/tcd.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/tgt.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/function_list.c
+set(CSOURCES
+    bio.c
+    cio.c
+    dwt.c
+    event.c
+    image.c
+    invert.c
+    j2k.c
+    jp2.c
+    mct.c
+    mqc.c
+    openjpeg.c
+    opj_clock.c
+    pi.c
+    raw.c
+    t1.c
+    t2.c
+    tcd.c
+    tgt.c
+    function_list.c
 )
+
+set(HEADERS
+    openjpeg.h opj_stdint.h ${CMAKE_CURRENT_BINARY_DIR}/opj_config.h
+)
+
 ###if(BUILD_JPIP)
 ###  add_definitions(-DUSE_JPIP)
 ###  set(OPENJPEG_SRCS
@@ -41,28 +45,47 @@ set(OPENJPEG_SRCS
 ###  )
 ###endif()
 
-# Build the library
-if(WIN32)
-  if(BUILD_SHARED_LIBS)
-    add_definitions(-DOPJ_EXPORTS)
-  else()
-    add_definitions(-DOPJ_STATIC)
-  endif()
+if(BUILD_SHARED_LIBS)
+    add_library(${OPENJPEG_LIBRARY_NAME} SHARED ${CSOURCES} ${HHEADERS})
+    set_target_properties (${OPENJPEG_LIBRARY_NAME} PROPERTIES
+        VERSION ${VERSION}
+        SOVERSION ${SOVERSION}
+        DEFINE_SYMBOL OPJ_EXPORTS
+    )
+    if(MSVC)
+        set_target_properties(${OPENJPEG_LIBRARY_NAME} PROPERTIES IMPORT_SUFFIX "_i.lib")
+    endif()
+elseif(OSX_FRAMEWORK)
+    add_library(${OPENJPEG_LIBRARY_NAME} SHARED ${CSOURCES} ${HHEADERS})
+    set_target_properties(${OPENJPEG_LIBRARY_NAME} PROPERTIES
+      FRAMEWORK TRUE
+      FRAMEWORK_VERSION ${FRAMEWORK_VERSION}
+      MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${VERSION}
+      MACOSX_FRAMEWORK_BUNDLE_VERSION ${VERSION}
+      MACOSX_FRAMEWORK_IDENTIFIER org.opencad.opencad
+      XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
+      PUBLIC_HEADER "${HHEADERS}"
+      VERSION ${VERSION}
+      SOVERSION ${SOVERSION}
+      )
+else()
+    add_library(${OPENJPEG_LIBRARY_NAME} STATIC ${CSOURCES} ${HHEADERS})
 endif()
-add_library(${OPENJPEG_LIBRARY_NAME} ${OPENJPEG_SRCS})
-if(UNIX)
-  target_link_libraries(${OPENJPEG_LIBRARY_NAME} m)
-endif()
-set_target_properties(${OPENJPEG_LIBRARY_NAME} PROPERTIES ${OPENJPEG_LIBRARY_PROPERTIES})
 
-# Install to Borsch dirs.
-install(TARGETS ${OPENJPEG_LIBRARY_NAME}
-    RUNTIME DESTINATION ${INSTALL_BIN_DIR} COMPONENT libraries
-    ARCHIVE DESTINATION ${INSTALL_LIB_DIR} COMPONENT libraries
-    LIBRARY DESTINATION ${INSTALL_LIB_DIR} COMPONENT libraries
-    FRAMEWORK DESTINATION ${INSTALL_LIB_DIR}
-)
-install(FILES openjpeg.h opj_stdint.h DESTINATION ${INSTALL_INC_DIR} COMPONENT headers)
+target_link_libraries(${OPENJPEG_LIBRARY_NAME} ${M_LIB})
+
+if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
+    install(TARGETS ${OPENJPEG_LIBRARY_NAME}
+        RUNTIME DESTINATION ${INSTALL_BIN_DIR} COMPONENT libraries
+        ARCHIVE DESTINATION ${INSTALL_LIB_DIR} COMPONENT libraries
+        LIBRARY DESTINATION ${INSTALL_LIB_DIR} COMPONENT libraries
+        FRAMEWORK DESTINATION ${INSTALL_LIB_DIR}
+    )
+endif()
+
+if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL)
+    install(FILES openjpeg.h opj_stdint.h ${CMAKE_CURRENT_BINARY_DIR}/opj_config.h DESTINATION ${INSTALL_INC_DIR} COMPONENT headers)
+endif()
 
 # install man page of the library
 ###install(
