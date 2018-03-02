@@ -95,9 +95,11 @@ add_test(NAME tda_prep_reversible_with_precinct COMMAND test_tile_encoder 1 256 
 add_test(NAME tda_reversible_with_precinct COMMAND test_decode_area -q reversible_with_precinct.j2k)
 set_property(TEST tda_reversible_with_precinct APPEND PROPERTY DEPENDS tda_prep_reversible_with_precinct)
 
+if(UNIX)
 add_test(NAME tda_prep_irreversible_no_precinct COMMAND test_tile_encoder 1 256 256 32 32 8 1 irreversible_no_precinct.j2k 4 4 3 0 0 1)
 add_test(NAME tda_irreversible_no_precinct COMMAND test_decode_area -q irreversible_no_precinct.j2k)
 set_property(TEST tda_irreversible_no_precinct APPEND PROPERTY DEPENDS tda_prep_irreversible_no_precinct)
+endif()
 
 add_test(NAME tda_prep_irreversible_203_201_17_19_no_precinct COMMAND test_tile_encoder 1 203 201 17 19 8 1 irreversible_203_201_17_19_no_precinct.j2k 4 4 3 0 0 1)
 add_test(NAME tda_irreversible_203_201_17_19_no_precinct COMMAND test_decode_area -q irreversible_203_201_17_19_no_precinct.j2k)
