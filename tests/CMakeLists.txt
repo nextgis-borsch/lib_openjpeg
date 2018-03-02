@@ -131,3 +131,11 @@ endif()
 
 add_executable(ppm2rgb3 ppm2rgb3.c)
 #add_executable(pdf2jp2 pdf2jp2.c)
+
+if(WIN32)
+    add_custom_command(TARGET ppm2rgb3
+                        POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${OPENJPEG_LIBRARY_NAME}> $<TARGET_FILE_DIR:ppm2rgb3>
+                        COMMENT "Copy ${OPENJPEG_LIBRARY_NAME} to tests"
+                    )
+endif()
