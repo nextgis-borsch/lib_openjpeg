@@ -2,7 +2,7 @@
 # Written by Mathieu Malaterre
 
 # Modified for NextGIS Borsch project (marked with ###)
-#  Copyright (c) 2017 NextGIS, <info@nextgis.com>
+#  Copyright (c) 2017-2018 NextGIS, <info@nextgis.com>
 
 # This CMake project will by default create a library called openjpeg
 # But if you want to use this project within your own (CMake) project
@@ -15,6 +15,16 @@ cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
 ### for Borsch
 project(openjpeg)
+
+
+if(NOT DEFINED PACKAGE_VENDOR)
+    set(PACKAGE_VENDOR NextGIS)
+endif()
+
+if(NOT DEFINED PACKAGE_BUGREPORT)
+    set(PACKAGE_BUGREPORT info@nextgis.com)
+endif()
+
 # Some init settings
 set(CMAKE_COLOR_MAKEFILE ON)
 # Set path to additional CMake modules
@@ -26,18 +36,22 @@ if(OSX_FRAMEWORK AND (BUILD_SHARED_LIBS OR BUILD_STATIC_LIBS))
 endif()
 
 if(OSX_FRAMEWORK)
-  set(INSTALL_BIN_DIR "${CMAKE_INSTALL_PREFIX}/bin" CACHE INTERNAL "Installation directory for executables" FORCE)
-  set(INSTALL_LIB_DIR "${CMAKE_INSTALL_PREFIX}/Library/Frameworks" CACHE INTERNAL "Installation directory for libraries" FORCE)
-  set(SKIP_INSTALL_EXECUTABLES OFF)
-  set(SKIP_INSTALL_EXPORT ON)
-  set(SKIP_INSTALL_FILES OFF)
-  set(SKIP_INSTALL_DOCS OFF)
-  set(CMAKE_MACOSX_RPATH ON)
+    set(INSTALL_BIN_DIR "bin" CACHE INTERNAL "Installation directory for executables" FORCE)
+    set(INSTALL_LIB_DIR "Library/Frameworks" CACHE INTERNAL "Installation directory for libraries" FORCE)
+    set(INSTALL_INC_DIR "${INSTALL_LIB_DIR}/${PROJECT_NAME}.framework/Headers" CACHE INTERNAL "Installation directory for headers" FORCE)
+    set(INSTALL_CMAKECONF_DIR ${INSTALL_LIB_DIR}/${PROJECT_NAME}.framework/Resources/CMake CACHE INTERNAL "Installation directory for cmake config files" FORCE)
+    set(SKIP_INSTALL_EXECUTABLES OFF)
+    set(SKIP_INSTALL_EXPORT ON)
+    set(SKIP_INSTALL_FILES OFF)
+    set(SKIP_INSTALL_DOCS OFF)
+    set(CMAKE_MACOSX_RPATH ON)
 else()
     include(GNUInstallDirs)
     set(INSTALL_BIN_DIR ${CMAKE_INSTALL_BINDIR} CACHE INTERNAL "Installation directory for executables" FORCE)
     set(INSTALL_LIB_DIR ${CMAKE_INSTALL_LIBDIR} CACHE INTERNAL "Installation directory for libraries" FORCE)
+    set(INSTALL_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE INTERNAL "Installation directory for headers" FORCE)
     set(INSTALL_DOC_DIR ${CMAKE_INSTALL_DOCDIR} CACHE INTERNAL "Installation directory for doc pages" FORCE)
+    set(INSTALL_CMAKECONF_DIR ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/CMake CACHE INTERNAL "Installation directory for cmake config files" FORCE)
 endif()
 
 include(util)
@@ -47,23 +61,22 @@ set(OPENJPEG_INSTALL_SUBDIR "openjpeg-${OPENJPEG_VERSION_MAJOR}.${OPENJPEG_VERSI
 
 if(OSX_FRAMEWORK)
     set(FRAMEWORK_VERSION "${OPENJPEG_VERSION_MAJOR}")
-    set(INSTALL_INC_DIR "${INSTALL_LIB_DIR}/${PROJECT_NAME}.framework/Versions/${FRAMEWORK_VERSION}/Headers/${OPENJPEG_INSTALL_SUBDIR}" CACHE INTERNAL "Installation directory for headers" FORCE)
+    set(INSTALL_FULL_INC_DIR "${INSTALL_LIB_DIR}/${PROJECT_NAME}.framework/Versions/${FRAMEWORK_VERSION}/Headers/${OPENJPEG_INSTALL_SUBDIR}" CACHE INTERNAL "Installation directory for headers" FORCE)
     set(INSTALL_DOC_DIR "${INSTALL_LIB_DIR}/${PROJECT_NAME}.framework/Versions/${FRAMEWORK_VERSION}/Resources/docs")
     set(INSTALL_INC_DIR_PACKAGE "${INSTALL_LIB_DIR}/${PROJECT_NAME}.framework/Versions/${FRAMEWORK_VERSION}/Headers" CACHE INTERNAL "Installation directory for headers in package" FORCE)
 else()
-    set(INSTALL_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR}/${OPENJPEG_INSTALL_SUBDIR} CACHE INTERNAL "Installation directory for headers" FORCE)
+    set(INSTALL_FULL_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR}/${OPENJPEG_INSTALL_SUBDIR} CACHE INTERNAL "Installation directory for headers" FORCE)
     set(INSTALL_SHARE_DIR ${CMAKE_INSTALL_DATADIR}/${OPENJPEG_INSTALL_SUBDIR} CACHE INTERNAL "Installation directory for share data" FORCE)
     set(INSTALL_INC_DIR_PACKAGE ${CMAKE_INSTALL_FULL_INCLUDEDIR} CACHE INTERNAL "Installation directory for headers in package" FORCE)
 endif()
 
 report_version(${PROJECT_NAME} ${VERSION})
 
-### Question: where these variables should be set (there are a lot of ${OPENJPEG_NAMESPACE}... variables in  the code)?
-set(OPENJPEG_SOURCE_DIR ${CMAKE_SOURCE_DIR})
-set(OPENJPEG_BINARY_DIR ${CMAKE_BINARY_DIR})
-
 if(COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0003 NEW)
+  if (NOT (${CMAKE_VERSION} VERSION_LESS 3.0))
+    cmake_policy(SET CMP0042 NEW)
+  endif()
 endif()
 
 if(NOT OPENJPEG_NAMESPACE)
@@ -72,14 +85,14 @@ if(NOT OPENJPEG_NAMESPACE)
 endif()
 # In all cases:
 #string(TOLOWER ${OPENJPEG_NAMESPACE} OPENJPEG_LIBRARY_NAME)
-###set(OPENJPEG_LIBRARY_NAME openjp2)
-set(OPENJPEG_LIBRARY_NAME ${PROJECT_NAME})
-
-###project(${OPENJPEG_NAMESPACE} C)
+set(OPENJPEG_LIBRARY_NAME openjpeg)
+set(OPENJPEG_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(OPENJPEG_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 # Do full dependency headers.
 include_regular_expression("^.*$")
 
+option(BUILD_DOC "Build the HTML documentation (with doxygen if available)." OFF)
 #-----------------------------------------------------------------------------
 # OPENJPEG version number, useful for packaging and doxygen doc:
 set(OPENJPEG_VERSION
@@ -87,24 +100,26 @@ set(OPENJPEG_VERSION
 set(PACKAGE_VERSION
   "${OPENJPEG_VERSION_MAJOR}.${OPENJPEG_VERSION_MINOR}.${OPENJPEG_VERSION_BUILD}")
 
-# Because autotools does not support X.Y notation for SOVERSION, we have to use
-# two numbering, one for the openjpeg version and one for openjpeg soversion
-# version | soversion
-#   1.0   |  0
-#   1.1   |  1
-#   1.2   |  2
-#   1.3   |  3
-#   1.4   |  4
-#   1.5   |  5
-#   1.5.1 |  5
-#   2.0   |  6
-#   2.0.1 |  6
-#   2.1   |  7
-#   2.1.1 |  7
-#   2.1.2 |  7
-# above is the recommendation by the OPJ team. If you really need to override this default,
-# you can specify your own OPENJPEG_SOVERSION at cmake configuration time:
-# cmake -DOPENJPEG_SOVERSION:STRING=42 /path/to/openjpeg
+  # Because autotools does not support X.Y notation for SOVERSION, we have to use
+  # two numbering, one for the openjpeg version and one for openjpeg soversion
+  # version | soversion
+  #   1.0   |  0
+  #   1.1   |  1
+  #   1.2   |  2
+  #   1.3   |  3
+  #   1.4   |  4
+  #   1.5   |  5
+  #   1.5.1 |  5
+  #   2.0   |  6
+  #   2.0.1 |  6
+  #   2.1   |  7
+  #   2.1.1 |  7
+  #   2.1.2 |  7
+  #   2.2.0 |  7
+  #   2.3.0 |  7
+  # above is the recommendation by the OPJ team. If you really need to override this default,
+  # you can specify your own OPENJPEG_SOVERSION at cmake configuration time:
+  # cmake -DOPENJPEG_SOVERSION:STRING=42 /path/to/openjpeg
 if(NOT OPENJPEG_SOVERSION)
   set(OPENJPEG_SOVERSION 7)
 endif(NOT OPENJPEG_SOVERSION)
@@ -134,12 +149,8 @@ endif()
 include (configure)
 
 #-----------------------------------------------------------------------------
-# Build Library
-add_subdirectory(src)
-
-#-----------------------------------------------------------------------------
 # Build Applications
-###option(BUILD_CODEC "Build the CODEC executables" ON)
+option(BUILD_CODEC "Build the CODEC executables" ON)
 ###option(BUILD_MJ2 "Build the MJ2 executables." OFF)
 ###option(BUILD_JPWL "Build the JPWL library and executables" OFF)
 ###option(BUILD_JPIP "Build the JPIP library and executables." OFF)
@@ -153,13 +164,13 @@ add_subdirectory(src)
 ###mark_as_advanced(BUILD_JAVA)
 ###mark_as_advanced(BUILD_JP3D)
 
-###if(BUILD_CODEC OR BUILD_MJ2)
+if(BUILD_CODEC OR BUILD_MJ2)
   # OFF: It will only build 3rd party libs if they are not found on the system
   # ON: 3rd party libs will ALWAYS be build, and used
 ###  option(BUILD_THIRDPARTY "Build the thirdparty executables if it is needed" OFF)
 ###  add_subdirectory(thirdparty)
-###  add_subdirectory(src/bin)
-###endif ()
+ add_subdirectory(src/bin)
+endif ()
 ###add_subdirectory(wrapping)
 
 #-----------------------------------------------------------------------------
@@ -183,45 +194,78 @@ add_subdirectory(src)
 ###  DESTINATION ${OPENJPEG_INSTALL_PACKAGE_DIR}
 ###)
 
+if(UNIX)
+  option(BUILD_PKGCONFIG_FILES "Build and install pkg-config files" ON)
+else()
+  option(BUILD_PKGCONFIG_FILES "Build and install pkg-config files" OFF)
+endif()
+
+set(PACKAGE_NAME ${PROJECT_NAME})
+string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
+
+#-----------------------------------------------------------------------------
+# Build Library
+add_subdirectory(src/lib)
+
 #-----------------------------------------------------------------------------
 # install CHANGES and LICENSE
-if(NOT SKIP_INSTALL_DOCS AND NOT SKIP_INSTALL_ALL)
-    if(EXISTS ${OPENJPEG_SOURCE_DIR}/CHANGES)
-      install(FILES CHANGES DESTINATION ${INSTALL_DOC_DIR})
-    endif()
-    install(FILES LICENSE DESTINATION ${INSTALL_DOC_DIR})
+if(BUILD_DOC)
+if(EXISTS ${OPENJPEG_SOURCE_DIR}/CHANGES)
+  install(FILES CHANGES DESTINATION ${OPENJPEG_INSTALL_DOC_DIR})
 endif()
 
-###include (cmake/OpenJPEGCPack.cmake)
+install(FILES LICENSE DESTINATION ${OPENJPEG_INSTALL_DOC_DIR})
+endif()
 
 #-----------------------------------------------------------------------------
+# Buld Testing
+option(BUILD_TESTING "Build the tests." OFF)
+if(BUILD_TESTING)
+  if(BUILD_CODEC)
+    enable_testing()
+    include(CTest)
 
-### Borsch export.
-if (REGISTER_PACKAGE)
-    # Replace the path so not to modify a "template" PackageConfig.cmake.in file.
-    set(INSTALL_INC_DIR ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+    # Search openjpeg data needed for the tests
+    # They could be found via git on the OpenJPEG GitHub code project
+    # git clone https://github.com/uclouvain/openjpeg-data.git
+    find_path(OPJ_DATA_ROOT README-OPJ-Data
+      PATHS $ENV{OPJ_DATA_ROOT} ${CMAKE_SOURCE_DIR}/../data
+      NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH
+      )
 
-    export(TARGETS ${PROJECT_NAME} FILE ${PROJECT_NAME}-exports.cmake)
+    # Add repository where to find tests
+    add_subdirectory(tests)
 
-    set(EXPORT_PACKAGE_NAME OpenJPEG)
-    string(TOUPPER ${EXPORT_PACKAGE_NAME} EXPORT_PACKAGE_NAME_UPPER)
-    set(EXPORT_PACKAGE_LIB_NAME ${PROJECT_NAME})
-    math(EXPR VERSION_NUM "${OPENJPEG_VERSION_MAJOR} * 10000 + ${OPENJPEG_VERSION_MINOR} * 100 + ${OPENJPEG_VERSION_BUILD}")
+  else()
+    message(FATAL_ERROR "You need build codec to run the tests")
+  endif()
+endif()
+#-----------------------------------------------------------------------------
 
-    export(PACKAGE ${EXPORT_PACKAGE_NAME})
+add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 
-    include(CMakePackageConfigHelpers)
-    configure_package_config_file(
-        ${CMAKE_SOURCE_DIR}/cmake/PackageConfig.cmake.in
-        ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_PACKAGE_NAME}Config.cmake
-        INSTALL_DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )
-    write_basic_package_version_file(
-        ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_PACKAGE_NAME}ConfigVersion.cmake
-        VERSION ${VERSION}
-        COMPATIBILITY AnyNewerVersion )
-else()
-    export(TARGETS ${PROJECT_NAME} FILE ${PROJECT_NAME}-exports.cmake EXPORT_LINK_INTERFACE_LIBRARIES)
+# Export package ===============================================================
+
+if(REGISTER_PACKAGE)
+    # Export the package for use from the build-tree
+    # (this registers the build-tree with a global CMake-registry)
+    export(PACKAGE ${PACKAGE_UPPER_NAME})
 endif()
 
-# uninstall
-add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+# Archiving ====================================================================
+
+set(CPACK_PACKAGE_NAME "${PACKAGE_NAME}")
+set(CPACK_PACKAGE_VENDOR "${PACKAGE_VENDOR}")
+set(CPACK_PACKAGE_VERSION "${VERSION}")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PACKAGE_NAME} Installation")
+set(CPACK_PACKAGE_RELOCATABLE TRUE)
+set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+set(CPACK_GENERATOR "ZIP")
+set(CPACK_MONOLITHIC_INSTALL ON)
+set(CPACK_STRIP_FILES TRUE)
+
+# Get cpack zip archive name
+get_cpack_filename(${VERSION} PROJECT_CPACK_FILENAME)
+set(CPACK_PACKAGE_FILE_NAME ${PROJECT_CPACK_FILENAME})
+
+include(CPack)

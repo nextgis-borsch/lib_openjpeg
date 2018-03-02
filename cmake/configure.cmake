@@ -48,13 +48,27 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/openjpeg_mangle.h.in
 endif()
 
 #-----------------------------------------------------------------------------
+# configure name mangling to allow multiple libraries to coexist
+# peacefully
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/openjpeg_mangle.h.in)
+set(MANGLE_PREFIX ${OPENJPEG_LIBRARY_NAME})
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/openjpeg_mangle.h.in
+               ${CMAKE_CURRENT_BINARY_DIR}/openjpeg_mangle.h
+               @ONLY)
+endif()
+
+#-----------------------------------------------------------------------------
 # Compiler specific flags:
 if(CMAKE_COMPILER_IS_GNUCC)
-# For all builds, make sure openjpeg is std99 compliant:
-# set(CMAKE_C_FLAGS "-Wall -std=c99 ${CMAKE_C_FLAGS}") # FIXME: this setting prevented us from setting a coverage build.
-# Do not use ffast-math for all build, it would produce incorrect results, only set for release:
-set(CMAKE_C_FLAGS_RELEASE "-ffast-math ${CMAKE_C_FLAGS_RELEASE}")
+  # For all builds, make sure openjpeg is std99 compliant:
+  # set(CMAKE_C_FLAGS "-Wall -std=c99 ${CMAKE_C_FLAGS}") # FIXME: this setting prevented us from setting a coverage build.
+  # Do not use ffast-math for all build, it would produce incorrect results, only set for release:
+  set(OPENJPEG_LIBRARY_COMPILE_OPTIONS ${OPENJPEG_LIBRARY_COMPILE_OPTIONS} "$<$<CONFIG:Release>:-ffast-math>")
+  set(OPENJP2_COMPILE_OPTIONS ${OPENJP2_COMPILE_OPTIONS} "$<$<CONFIG:Release>:-ffast-math>" -Wall -Wextra -Wconversion -Wunused-parameter -Wdeclaration-after-statement -Werror=declaration-after-statement)
 endif()
+
+#-----------------------------------------------------------------------------
+# opj_config.h generation (1/2)
 
 # Check if some include files are provided by the system
 include(EnsureFileInclude)
@@ -74,19 +88,20 @@ ensure_file_include("assert.h"   HAVE_ASSERT_H YES)
 ensure_file_include("stdint.h"   OPJ_HAVE_STDINT_H   NO)
 ensure_file_include("inttypes.h" OPJ_HAVE_INTTYPES_H NO)
 
-#-----------------------------------------------------------------------------
-# opj_config.h generation (1/2)
-include (CheckIncludeFile)
-check_include_file("strings.h"      HAVE_STRINGS_H)
-check_include_file("sys/stat.h"     HAVE_SYS_STAT_H)
-check_include_file("sys/types.h"    HAVE_SYS_TYPES_H)
-check_include_file("unistd.h"       HAVE_UNISTD_H)
-check_include_file("malloc.h"       OPJ_HAVE_MALLOC_H)
+# why check this one ? for openjpip ?
+include (${CMAKE_ROOT}/Modules/CheckIncludeFile.cmake)
+CHECK_INCLUDE_FILE("strings.h"      HAVE_STRINGS_H)
+CHECK_INCLUDE_FILE("sys/stat.h"     HAVE_SYS_STAT_H)
+CHECK_INCLUDE_FILE("sys/types.h"    HAVE_SYS_TYPES_H)
+CHECK_INCLUDE_FILE("unistd.h"       HAVE_UNISTD_H)
 
-# ssize_t
-include(CheckTypeSize)
-CHECK_TYPE_SIZE(ssize_t     SSIZE_T)
+# Enable Large file support
+include(TestLargeFiles)
+OPJ_TEST_LARGE_FILES(OPJ_HAVE_LARGEFILES)
 
+# Allocating Aligned Memory Blocks
+include(CheckIncludeFiles)
+check_include_files(malloc.h OPJ_HAVE_MALLOC_H)
 include(CheckSymbolExists)
 # _aligned_alloc https://msdn.microsoft.com/en-us/library/8z34s9c6.aspx
 check_symbol_exists(_aligned_malloc malloc.h OPJ_HAVE__ALIGNED_MALLOC)
@@ -97,9 +112,9 @@ unset(CMAKE_REQUIRED_DEFINITIONS)
 # memalign (obsolete)
 check_symbol_exists(memalign malloc.h OPJ_HAVE_MEMALIGN)
 
-# Enable Large file support
-include(TestLargeFiles)
-OPJ_TEST_LARGE_FILES(OPJ_HAVE_LARGEFILES)
+# ssize_t
+include(CheckTypeSize)
+CHECK_TYPE_SIZE(ssize_t     SSIZE_T)
 
 find_library(M_LIB m)
 
@@ -110,4 +125,18 @@ if(HAVE_INTTYPES_H)
     set(OPJ_HAVE_INTTYPES_H 1)
 endif()
 
+#-----------------------------------------------------------------------------
+# opj_config.h generation (2/2)
+configure_file(
+ ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/openjp2/opj_config.h.cmake.in
+ ${CMAKE_CURRENT_BINARY_DIR}/src/lib/openjp2/opj_config.h
+ @ONLY
+ )
+
+ configure_file(
+ ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/openjp2/opj_config_private.h.cmake.in
+ ${CMAKE_CURRENT_BINARY_DIR}/src/lib/openjp2/opj_config_private.h
+ @ONLY
+ )
+ 
 configure_file(${CMAKE_SOURCE_DIR}/cmake/uninstall.cmake.in ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
