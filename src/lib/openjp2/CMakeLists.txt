@@ -116,7 +116,6 @@ elseif(OSX_FRAMEWORK)
       # PUBLIC_HEADER "${HHEADERS}"
       VERSION ${VERSION}
       SOVERSION ${SOVERSION}
-      IMPORTED_GLOBAL TRUE
       )
 else()
     add_definitions(-DOPJ_STATIC)
