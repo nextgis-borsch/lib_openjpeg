@@ -34,7 +34,7 @@ function(check_version major minor rev)
 
     set(MAJOR_VERSION 2)
     set(MINOR_VERSION 3)
-    set(REV_VERSION 0)
+    set(REV_VERSION 1)
 
     set(${major} ${MAJOR_VERSION} PARENT_SCOPE)
     set(${minor} ${MINOR_VERSION} PARENT_SCOPE)

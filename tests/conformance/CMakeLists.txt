@@ -334,7 +334,6 @@ foreach(numFileC1P0 RANGE 1 16)
       -r ${ResFactor}
       )
 
-if(TARGET compare_images)
   add_test(NAME ETS-C1P0-${filenameInput}-compare2ref
       COMMAND compare_images
      -b ${BASELINE_CONF}/${filenameRef}
@@ -361,8 +360,6 @@ if(TARGET compare_images)
   set_tests_properties(NR-C1P0-${filenameInput}-compare2base
                        PROPERTIES DEPENDS
                        ETS-C1P0-${filenameInput}-decode)
-
-    endif()
 
 endforeach()
 
@@ -394,7 +391,6 @@ foreach(numFileC1P1 RANGE 1 7)
       -r 0
       )
 
-if(TARGET compare_images)
   add_test(NAME ETS-C1P1-${filenameInput}-compare2ref
       COMMAND compare_images
      -b ${BASELINE_CONF}/${filenameRef}
@@ -421,7 +417,7 @@ if(TARGET compare_images)
   set_tests_properties(NR-C1P1-${filenameInput}-compare2base
                        PROPERTIES DEPENDS
                        ETS-C1P1-${filenameInput}-decode)
-endif()
+
 endforeach()
 
 #--------------------------------------------------------------------------
@@ -447,7 +443,6 @@ foreach(numFileJP2 RANGE 1 9)
     -force-rgb
   )
 
-if(TARGET compare_images)
   add_test(NAME ETS-JP2-${filenameInput}-compare2ref
     COMMAND compare_images
     -b ${BASELINE_CONF}/${filenameRef}
@@ -474,7 +469,7 @@ if(TARGET compare_images)
   set_tests_properties(NR-JP2-${filenameInput}-compare2base
     PROPERTIES DEPENDS
     ETS-JP2-${filenameInput}-decode)
-endif()
+
 endforeach()
 
 #--------------------------------------------------------------------------
@@ -536,7 +531,6 @@ foreach(kdu_file ${kdu_j2k_conf_files})
     set(kdu_test_args_tol -p 4:4:4 -m 1:1:1)
   endif()
 
-if(TARGET compare_images)
   add_test(NAME ETS-KDU-${filenameInput}-compare2ref
     COMMAND compare_images
     -b ${BASELINE_CONF}/${filenameRef}
@@ -560,7 +554,6 @@ if(TARGET compare_images)
   set_tests_properties(NR-KDU-${filenameInput}-compare2base
     PROPERTIES DEPENDS
     ETS-KDU-${filenameInput}-decode)
-endif()
 endforeach()
 
 #--------------------------------------------------------------------------
@@ -592,7 +585,6 @@ foreach(r_file ${richter_jp2_conf_files})
 
   set(ric_test_args -n 1)
 
-if(TARGET compare_images)
   add_test(NAME ETS-RIC-${filenameInput}-compare2ref
     COMMAND compare_images
     -b ${BASELINE_CONF}/${filenameRef}
@@ -617,7 +609,6 @@ if(TARGET compare_images)
   set_tests_properties(NR-RIC-${filenameInput}-compare2base
     PROPERTIES DEPENDS
     ETS-RIC-${filenameInput}-decode)
-endif()
 endforeach()
 
 #--------------------------------------------------------------------------#
@@ -655,6 +646,7 @@ foreach(numFileP0 RANGE 1 16)
   set_tests_properties(NR-${filenameInput}-compare_dump2base
                        PROPERTIES DEPENDS
                        NR-${filenameInput}-dump)
+
 endforeach()
 
 #--------------------------------------------------------------------------
