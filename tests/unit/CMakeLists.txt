@@ -7,8 +7,8 @@ include_directories(
 
 set(unit_test
   testempty0
-  testempty1
-  testempty2
+  # testempty1
+  # testempty2
 )
 foreach(ut ${unit_test})
   add_executable(${ut} ${ut}.c)
