@@ -12,6 +12,6 @@ set(unit_test
 )
 foreach(ut ${unit_test})
   add_executable(${ut} ${ut}.c)
-  target_link_libraries(${ut} openjp2)
+  target_link_libraries(${ut} ${OPENJPEG_LIBRARY_NAME})
   add_test(NAME ${ut} COMMAND ${ut})
 endforeach()
