@@ -2,7 +2,7 @@
 # Written by Mathieu Malaterre
 
 # Modified for NextGIS Borsch project (marked with ###)
-#  Copyright (c) 2017-2018 NextGIS, <info@nextgis.com>
+#  Copyright (c) 2017-2019 NextGIS, <info@nextgis.com>
 
 # This CMake project will by default create a library called openjpeg
 # But if you want to use this project within your own (CMake) project
@@ -54,6 +54,10 @@ else()
     set(INSTALL_DOC_DIR ${CMAKE_INSTALL_DOCDIR} CACHE INTERNAL "Installation directory for doc pages" FORCE)
     set(INSTALL_CMAKECONF_DIR ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/CMake CACHE INTERNAL "Installation directory for cmake config files" FORCE)
 endif()
+
+
+set(PACKAGE_NAME ${PROJECT_NAME})
+string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
 
 include(util)
 check_version(OPENJPEG_VERSION_MAJOR OPENJPEG_VERSION_MINOR OPENJPEG_VERSION_BUILD)
@@ -197,9 +201,6 @@ if(UNIX)
 else()
   option(BUILD_PKGCONFIG_FILES "Build and install pkg-config files" OFF)
 endif()
-
-set(PACKAGE_NAME ${PROJECT_NAME})
-string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
 
 #-----------------------------------------------------------------------------
 # Build Library
