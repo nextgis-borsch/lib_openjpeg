@@ -33,8 +33,8 @@ function(check_version major minor rev)
     set(VERSION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/cmake/util.cmake)
 
     set(MAJOR_VERSION 2)
-    set(MINOR_VERSION 3)
-    set(REV_VERSION 1)
+    set(MINOR_VERSION 4)
+    set(REV_VERSION 0)
 
     set(${major} ${MAJOR_VERSION} PARENT_SCOPE)
     set(${minor} ${MINOR_VERSION} PARENT_SCOPE)
