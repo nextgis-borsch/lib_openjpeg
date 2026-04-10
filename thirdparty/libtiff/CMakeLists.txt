@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
-set(CMAKE_C_STANDARD 99)
+cmake_minimum_required(VERSION 3.16.3)
 project(libtiff C)
 
 string(REPLACE "-Wdeclaration-after-statement" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")

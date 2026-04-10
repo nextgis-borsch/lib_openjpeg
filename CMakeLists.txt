@@ -7,7 +7,7 @@
 # For this purpose you can define a CMake var: OPENJPEG_NAMESPACE to whatever you like
 # e.g.:
 # set(OPENJPEG_NAMESPACE "GDCMOPENJPEG")
-cmake_minimum_required(VERSION 3.5...3.31.5)
+cmake_minimum_required(VERSION 3.16.3)
 
 if(NOT OPENJPEG_NAMESPACE)
   set(OPENJPEG_NAMESPACE "OPENJPEG")
@@ -16,8 +16,6 @@ endif()
 # In all cases:
 #string(TOLOWER ${OPENJPEG_NAMESPACE} OPENJPEG_LIBRARY_NAME)
 set(OPENJPEG_LIBRARY_NAME openjp2)
-
-project(${OPENJPEG_NAMESPACE} C)
 
 # Do full dependency headers.
 include_regular_expression("^.*$")
@@ -31,6 +29,15 @@ set(OPENJPEG_VERSION
   "${OPENJPEG_VERSION_MAJOR}.${OPENJPEG_VERSION_MINOR}.${OPENJPEG_VERSION_BUILD}")
 set(PACKAGE_VERSION
   "${OPENJPEG_VERSION_MAJOR}.${OPENJPEG_VERSION_MINOR}.${OPENJPEG_VERSION_BUILD}")
+
+project(${OPENJPEG_NAMESPACE}
+  VERSION ${OPENJPEG_VERSION}
+  LANGUAGES C
+)
+
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/borsch/cmake/version.cmake)
+write_version(${CMAKE_CURRENT_LIST_DIR}/CHANGELOG.md ${PROJECT_VERSION_MAJOR} ${PROJECT_VERSION_MINOR} ${PROJECT_VERSION_PATCH})
+report_version(${PROJECT_NAME} ${PROJECT_VERSION})
 
 # Because autotools does not support X.Y notation for SOVERSION, we have to use
 # two numbering, one for the openjpeg version and one for openjpeg soversion
@@ -144,7 +151,7 @@ configure_file(
 #-----------------------------------------------------------------------------
 # OpenJPEG build configuration options.
 option(BUILD_SHARED_LIBS "Build OpenJPEG shared library and link executables against it." ON)
-option(BUILD_STATIC_LIBS "Build OpenJPEG static library." ON)
+option(BUILD_STATIC_LIBS "Build OpenJPEG static library." OFF)
 set (EXECUTABLE_OUTPUT_PATH ${OPENJPEG_BINARY_DIR}/bin CACHE PATH "Single output directory for building all executables.")
 set (LIBRARY_OUTPUT_PATH ${OPENJPEG_BINARY_DIR}/bin CACHE PATH "Single output directory for building all libraries.")
 mark_as_advanced(LIBRARY_OUTPUT_PATH EXECUTABLE_OUTPUT_PATH)
@@ -293,28 +300,6 @@ if(BUILD_TESTING)
 endif()
 
 #-----------------------------------------------------------------------------
-# install all targets referenced as OPENJPEGTargets (relocatable with CMake 3.0+)
-install(EXPORT OpenJPEGTargets DESTINATION ${OPENJPEG_INSTALL_PACKAGE_DIR})
-include(CMakePackageConfigHelpers)
-configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/OpenJPEGConfig.cmake.in
-  ${OPENJPEG_BINARY_DIR}/OpenJPEGConfig.cmake
-  INSTALL_DESTINATION ${OPENJPEG_INSTALL_PACKAGE_DIR}
-  PATH_VARS CMAKE_INSTALL_INCLUDEDIR)
-write_basic_package_version_file(
-  ${OPENJPEG_BINARY_DIR}/OpenJPEGConfigVersion.cmake
-  COMPATIBILITY SameMajorVersion
-  VERSION ${OPENJPEG_VERSION})
-install(
-  FILES
-    ${OPENJPEG_BINARY_DIR}/OpenJPEGConfig.cmake
-    ${OPENJPEG_BINARY_DIR}/OpenJPEGConfigVersion.cmake
-  DESTINATION ${OPENJPEG_INSTALL_PACKAGE_DIR})
-
-#-----------------------------------------------------------------------------
-
-include (cmake/OpenJPEGCPack.cmake)
-
-#-----------------------------------------------------------------------------
 # pkgconfig support
 macro(set_variable_from_rel_or_absolute_path var root rel_or_abs_path)
   if(IS_ABSOLUTE "${rel_or_abs_path}")
@@ -360,3 +345,11 @@ endif()
 
 # build our version of astyle
 SET (WITH_ASTYLE FALSE CACHE BOOL "If you plan to contribute you should reindent with scripts/prepare-commit.sh (using 'our' astyle)")
+
+# Installing and packaging
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/borsch/cmake/packaging.cmake)
+create_borsch_package(${PROJECT_NAME}
+  VERSION ${PROJECT_VERSION}
+  TARGETS ${OPENJPEG_LIBRARY_NAME} opj_compress opj_decompress opj_dump
+  VENDOR NextGIS
+)

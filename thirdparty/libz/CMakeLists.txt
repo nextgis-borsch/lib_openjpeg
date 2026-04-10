@@ -1,6 +1,6 @@
 #based on zlib-1.2.5/CMakeLists.txt
 #
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.16.3)
 
 project(zlib C)
 

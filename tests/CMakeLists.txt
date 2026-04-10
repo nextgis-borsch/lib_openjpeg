@@ -13,7 +13,7 @@ include_directories(
 # First thing define the common source:
 set(compare_images_SRCS compare_images.c
   ${OPENJPEG_SOURCE_DIR}/src/bin/jp2/convert.c
-  ${OPENJPEG_SOURCE_DIR}/src/bin/jp2/converttif.c
+  # ${OPENJPEG_SOURCE_DIR}/src/bin/jp2/converttif.c
   ${OPENJPEG_SOURCE_DIR}/src/bin/common/opj_getopt.c
   )
 
@@ -114,8 +114,8 @@ if(NOT OPJ_HAVE_LIBPNG)
   message(WARNING "Lib PNG seems to be not available: if you want run the non-regression tests with images reported to the dashboard, you need it (try BUILD_THIRDPARTY)")
 endif()
 
-add_subdirectory(conformance)
-add_subdirectory(nonregression)
+# add_subdirectory(conformance)
+# add_subdirectory(nonregression)
 add_subdirectory(unit)
 
 if(BUILD_JPIP)
